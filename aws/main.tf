@@ -40,6 +40,13 @@ resource "aws_security_group" "my_sg" {
         protocol = "TCP"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
+    } 
 
 }
 
@@ -53,12 +60,21 @@ resource "aws_key_pair" "deployer" {
 }
 
 resource "aws_instance" "app_server" {
-  count = 2
+  count = 3
   availability_zone = data.aws_availability_zones.available.names[count.index]
   ami           = "ami-08c40ec9ead489470"
   key_name      = "${aws_key_pair.deployer.key_name}"
   instance_type = "t2.small"
   security_groups = ["${aws_security_group.my_sg.name}"]
+  
+  user_data = <<-EOF
+  #!/bin/bash
+  echo "*** Installing apache2"
+  sudo apt update -y
+  sudo apt install apache2 -y
+  echo "Hello from $(hostname)" | sudo tee /var/www/html/index.html
+  EOF
+  
   tags = {
     Name = "ExampleAppServerInstance"
   }
