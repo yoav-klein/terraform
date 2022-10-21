@@ -1,6 +1,47 @@
+
+# data sources to get VPC and subnets
 data "aws_vpc" "default" {
     default = true
 }
+
+data "aws_subnets" "all" {
+    filter {
+        name = "vpc-id"
+        values = [data.aws_vpc.default.id]
+    }
+}
+
+resource "aws_security_group" "lb_sg" {
+    name = "lb_sg"
+    # vpc - defaults to the deafult vpc
+     
+    ingress {
+        description = "HTTP"
+        from_port = 80
+        to_port = 80
+        protocol = "TCP"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    
+    ingress {
+        description = "HTTPS"
+        from_port = 443
+        to_port = 443
+        protocol = "TCP"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
+    } 
+
+}
+
+
+resource "aws_security_group"
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
@@ -11,8 +52,8 @@ module "alb" {
   load_balancer_type = "application"
 
   vpc_id             = data.aws_vpc.default
-  subnets            = 
-  security_groups    = ["sg-edcd9784", "sg-edcd9785"]
+  subnets            = data.aws_subnets.all
+  security_groups    = aws_security_group.lb_sg
 
   access_logs = {
     bucket = "my-alb-logs"
@@ -22,29 +63,11 @@ module "alb" {
     {
       name_prefix      = "pref-"
       backend_protocol = "HTTP"
-      backend_port     = 80
-      target_type      = "instance"
-      targets = {
-        my_target = {
-          target_id = "i-0123456789abcdefg"
-          port = 80
-        }
-        my_other_target = {
-          target_id = "i-a1b2c3d4e5f6g7h8i"
-          port = 8080
-        }
-      }
+      backend_port     = 8080
+      target_type      = "IP"
     }
   ]
 
-  https_listeners = [
-    {
-      port               = 443
-      protocol           = "HTTPS"
-      certificate_arn    = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
-      target_group_index = 0
-    }
-  ]
 
   http_tcp_listeners = [
     {
