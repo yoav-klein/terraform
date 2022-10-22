@@ -87,3 +87,5 @@ resource "aws_ecs_task_definition" "counter-service" {
   memory = 2048
   network_mode = "awsvpc"
 }
+
+

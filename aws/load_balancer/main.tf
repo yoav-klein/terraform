@@ -1,4 +1,23 @@
 
+
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
+    }
+  }
+
+  required_version = ">= 1.2.0"
+}
+
+provider "aws" {
+  region  = "us-east-1"
+}
+
+
+
 # data sources to get VPC and subnets
 data "aws_vpc" "default" {
     default = true
@@ -41,7 +60,6 @@ resource "aws_security_group" "lb_sg" {
 }
 
 
-resource "aws_security_group"
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
@@ -51,20 +69,17 @@ module "alb" {
 
   load_balancer_type = "application"
 
-  vpc_id             = data.aws_vpc.default
-  subnets            = data.aws_subnets.all
-  security_groups    = aws_security_group.lb_sg
+  vpc_id             = data.aws_vpc.default.id
+  subnets            = data.aws_subnets.all.ids
+  security_groups    = [aws_security_group.lb_sg.id]
 
-  access_logs = {
-    bucket = "my-alb-logs"
-  }
 
   target_groups = [
     {
       name_prefix      = "pref-"
       backend_protocol = "HTTP"
       backend_port     = 8080
-      target_type      = "IP"
+      target_type      = "ip"
     }
   ]
 
