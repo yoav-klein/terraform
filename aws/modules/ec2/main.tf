@@ -22,7 +22,7 @@ data "aws_subnets" "default_subnets" {
 
 resource "aws_security_group" "sg" {
   name = "mySecurityGroup"
-  vpc_id = var.default_vpc ? var.vpc_id : data.aws_vpc.default.id
+  vpc_id = var.default_vpc ?  data.aws_vpc.default.id : var.vpc_id
 
   ingress {
     description = "ssh connectivity"
