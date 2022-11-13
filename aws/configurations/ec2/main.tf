@@ -15,4 +15,5 @@ module "myInstance" {
     source = "../../modules/ec2"
     
     pub_key_path="${path.module}/aws.pub"
+    instance_count = 1
 }

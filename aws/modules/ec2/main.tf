@@ -8,9 +8,21 @@ terraform {
     }
 }
 
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnets" "default_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+
 resource "aws_security_group" "sg" {
   name = "mySecurityGroup"
-  vpc_id = var.vpc_id
+  vpc_id = var.default_vpc ? var.vpc_id : data.aws_vpc.default.id
 
   ingress {
     description = "ssh connectivity"
@@ -49,28 +61,14 @@ resource "aws_key_pair" "deployer" {
   public_key = file(var.pub_key_path)
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnets" "subnet_ids" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
-
-
 resource "aws_instance" "ec2_instance" {
   count = var.instance_count
 
   ami                  = "ami-03dbf0c122cb6cf1d" # Amazon Linux AMI
   key_name             = aws_key_pair.deployer.key_name
-  instance_type        = "t3.micro"
+  instance_type        = var.instance_type
   vpc_security_group_ids  = [aws_security_group.sg.id]
-  subnet_id = var.default_vpc ? 
-      data.aws_subnets.subnet_ids[count.index % length(data.aws_subnets.subnet_ids)] : 
-      var.subnet_ids[count.index % length(var.subnet_ids)]
+  subnet_id = var.default_vpc ?  data.aws_subnets.default_subnets.ids[count.index % length(data.aws_subnets.default_subnets)] : var.subnet_ids[count.index % length(var.subnet_ids)]
 
   tags = {
     Name = "myInstance${count.index}"
