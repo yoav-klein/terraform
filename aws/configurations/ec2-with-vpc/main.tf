@@ -39,6 +39,6 @@ module "myInstance" {
     default_vpc = false
     vpc_id = module.vpc.vpc_id
     subnet_ids = module.vpc.public_subnets
-    pub_key_path="${path.module}/aws.pub"
+    pub_key_path="${path.module}/key.pub"
     instance_count = 1
 }
