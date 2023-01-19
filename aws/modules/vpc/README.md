@@ -33,6 +33,7 @@ Each subnet object in the `public_subnets` and `private_subnets` must have the f
 | --- | --- | --- |
 | az | `string` | Availability zone |
 | cidr | `string` | CIDR block for the subnet |
+| auto_assign_public_ip | `bool` | Whether or not to assign IP address for instance in the subnet |
 
 ## Outputs
 ---

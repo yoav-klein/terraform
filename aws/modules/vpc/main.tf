@@ -48,15 +48,18 @@ resource "aws_route_table" "public" {
 }
 
 
-#####
+######################################
+#
 # A list of public subnets
 # to be created in the VPC
-
+#
+######################################
 resource "aws_subnet" "public_subnets" {
   count = length(var.public_subnets)
   vpc_id            = aws_vpc.this.id
   availability_zone = var.public_subnets[count.index].az
   cidr_block        = var.public_subnets[count.index].cidr
+  map_public_ip_on_launch = var.auto_assign_public_ip
   tags = {
     Name = "${var.vpc_name}-pub-subnet-${count.index}"
   }
@@ -68,10 +71,12 @@ resource "aws_route_table_association" "publics" {
     route_table_id = aws_route_table.public.id
 }
 
-####
+########################################
+#
 # A list of private subnets
 # to be created in the VPC
-
+#
+########################################
 resource "aws_subnet" "private_subnets" {
     count = length(var.private_subnets)
     vpc_id = aws_vpc.this.id

@@ -26,3 +26,9 @@ variable "private_subnets" {
         az = string
     }))
 }
+
+variable "auto_assign_public_ip" {
+    description = "Whether or not to enable auto-assign public IP in the subnet"
+    default = true
+    type = bool
+}
