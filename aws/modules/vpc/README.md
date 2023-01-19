@@ -26,6 +26,7 @@ If `public_subnets` specified:
 | vpc_id | `string` | Name tag for the VPC |
 | public_subnets | `list(object)` | List of public subnets, see below |
 | private_subnets | `list(object)` | List of private subnets, see below |
+| auto_assign_public_ip | `bool` | Whether or not to assign IP address for instance in the subnet |
 
 ### subnet object
 Each subnet object in the `public_subnets` and `private_subnets` must have the following fields:
@@ -33,7 +34,6 @@ Each subnet object in the `public_subnets` and `private_subnets` must have the f
 | --- | --- | --- |
 | az | `string` | Availability zone |
 | cidr | `string` | CIDR block for the subnet |
-| auto_assign_public_ip | `bool` | Whether or not to assign IP address for instance in the subnet |
 
 ## Outputs
 ---
