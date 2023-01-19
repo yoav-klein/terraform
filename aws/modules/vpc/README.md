@@ -1,15 +1,22 @@
-i
+
 # VPC
 ---
 
 A module which creates a VPC, along with some other resources.
 
-## Usage
+## Resources
 ---
 
-```
+* VPC
+* Private subnets (if `private_subnets` specified)
+If `public_subnets` specified:
+* Internet gateway
+* Route table
+* Public subnets associated with the route table
 
-```
+## Examples
+---
+[Simple example](https://github.com/yoav-klein/terraform/tree/main/aws/configurations/vpc_test)
 
 ## Inputs
 ---
