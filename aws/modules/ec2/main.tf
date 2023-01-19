@@ -20,7 +20,7 @@ data "aws_subnets" "default_subnets" {
 }
 
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "default_sg" {
   name = "mySecurityGroup"
   vpc_id = var.default_vpc ?  data.aws_vpc.default.id : var.vpc_id
 
@@ -47,6 +47,7 @@ resource "aws_security_group" "sg" {
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -56,18 +57,18 @@ resource "aws_security_group" "sg" {
   }
 }
 
-resource "aws_key_pair" "deployer" {
+resource "aws_key_pair" "this" {
   key_name   = "myKey"
   public_key = file(var.pub_key_path)
 }
 
-resource "aws_instance" "ec2_instance" {
+resource "aws_instance" "this" {
   count = var.instance_count
 
   ami                  = "ami-03dbf0c122cb6cf1d" # Amazon Linux AMI
-  key_name             = aws_key_pair.deployer.key_name
+  key_name             = aws_key_pair.this.key_name
   instance_type        = var.instance_type
-  vpc_security_group_ids  = [aws_security_group.sg.id]
+  vpc_security_group_ids  = var.use_default_sg ? [aws_security_group.default_sg.id] : var.security_group_ids
   subnet_id = var.default_vpc ?  data.aws_subnets.default_subnets.ids[count.index % length(data.aws_subnets.default_subnets)] : var.subnet_ids[count.index % length(var.subnet_ids)]
 
   tags = {

@@ -33,3 +33,14 @@ variable "pub_key_path" {
     description = "Path to a public key"
 }
 
+variable "use_default_sg" {
+    type = bool
+    description = "Should use deafult Security group (SSH, HTTP and HTTPS)"
+    default = true
+}
+
+variable "security_group_ids" {
+    default = []
+    description = "List of security groups to associate with the insatces"
+    type = list(string)
+}
