@@ -1,12 +1,5 @@
 
 
-# - VPC
-# - the user specifies a list of "public_subnets": { "cidr", "az" }
-# - the user specifies a list of "private_subnets": {"cidr", "az"}
-#
-#
-
-
 data "aws_availability_zones" "this" {
   state = "available"
 }
