@@ -1,9 +1,25 @@
 
+variable "name" {
+    type = string
+    description = "Instance(s) name"
+}
+
 variable "instance_type" {
     type = string
     description = "Instance type"
     default = "t2.small"
 }
+
+variable "pub_key_path" {
+    type = string
+    description = "Path to a public key"
+}
+
+variable "instance_count" {
+    type = number
+    description = "Number of instances"
+}
+
 
 variable "default_vpc" {
     type = bool
@@ -17,20 +33,10 @@ variable "vpc_id" {
     default = ""
 }
 
-variable "instance_count" {
-    type = number
-    description = "Number of instances"
-}
-
 variable "subnet_ids" {
     type = list(string)
     description = "Subnets to run the instances in. irrelevant If default_vpc is true"
     default = [""]
-}
-
-variable "pub_key_path" {
-    type = string
-    description = "Path to a public key"
 }
 
 variable "use_default_sg" {

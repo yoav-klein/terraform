@@ -12,11 +12,12 @@ data "aws_subnets" "default_subnets" {
 
 
 resource "aws_security_group" "default_sg" {
-  name = "mySecurityGroup"
+  name = "${var.name}-security-group"
   vpc_id = var.default_vpc ?  data.aws_vpc.default.id : var.vpc_id
+  count = var.use_default_sg ? 1 : 0
 
   ingress {
-    description = "ssh connectivity"
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "TCP"
@@ -49,7 +50,7 @@ resource "aws_security_group" "default_sg" {
 }
 
 resource "aws_key_pair" "this" {
-  key_name   = "myKey"
+  key_name   = "${var.name}-keypair"
   public_key = file(var.pub_key_path)
 }
 
@@ -59,11 +60,11 @@ resource "aws_instance" "this" {
   ami                  = "ami-03dbf0c122cb6cf1d" # Amazon Linux AMI
   key_name             = aws_key_pair.this.key_name
   instance_type        = var.instance_type
-  vpc_security_group_ids  = var.use_default_sg ? [aws_security_group.default_sg.id] : var.security_group_ids
+  vpc_security_group_ids  = var.use_default_sg ? concat([aws_security_group.default_sg[0].id], var.security_group_ids) : var.security_group_ids
   subnet_id = var.default_vpc ?  data.aws_subnets.default_subnets.ids[count.index % length(data.aws_subnets.default_subnets)] : var.subnet_ids[count.index % length(var.subnet_ids)]
 
   tags = {
-    Name = "myInstance${count.index}"
+    Name = "${var.name}-${count.index}"
   }
 
 }
