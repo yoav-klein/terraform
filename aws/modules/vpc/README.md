@@ -16,7 +16,7 @@ If `public_subnets` specified:
 
 ## Examples
 ---
-[Simple example](https://github.com/yoav-klein/terraform/tree/main/aws/configurations/vpc_test)
+[Simple example](https://github.com/yoav-klein/terraform/tree/main/aws/test/vpc)
 
 ## Inputs
 ---

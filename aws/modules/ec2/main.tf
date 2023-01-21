@@ -19,7 +19,6 @@ data "aws_subnets" "default_subnets" {
   }
 }
 
-
 resource "aws_security_group" "default_sg" {
   name = "${var.name}-security-group"
   vpc_id = var.default_vpc ?  data.aws_vpc.default.id : var.vpc_id

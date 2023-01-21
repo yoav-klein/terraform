@@ -14,7 +14,7 @@ These are the resource that will be created by this module
 ## Examples
 ---
 
-See example usage [here](https://github.com/yoav-klein/terraform/test/x)
+See example usage [here](https://github.com/yoav-klein/terraform/tree/master/aws/test/x)
 
 ## Inputs
 ---
