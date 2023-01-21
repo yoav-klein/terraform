@@ -1,5 +1,5 @@
 
-variable "vpc_name" {
+variable "name" {
   type    = string
   default = "my-vpc"
 }

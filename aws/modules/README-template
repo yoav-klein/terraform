@@ -1,0 +1,31 @@
+
+# Module
+---
+
+A module for provisioning x
+
+## Resources
+---
+These are the resource that will be created by this module
+
+* A
+* B
+
+## Examples
+---
+
+See example usage [here](https://github.com/yoav-klein/terraform/test/x)
+
+## Inputs
+---
+
+| Name | Type | Description |
+| --- | --- | --- |
+| A | `string` | kuku |
+
+## Outputs
+---
+
+| Name | Type | Description |
+| --- | --- | --- |
+| B | `number` | buku |

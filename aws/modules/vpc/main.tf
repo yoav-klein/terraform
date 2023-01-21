@@ -1,5 +1,14 @@
 
 
+terraform {
+    required_providers {
+        aws = {
+            source = "hashicorp/aws"
+            version = ">= 4.51"
+        }
+    }
+}
+
 data "aws_availability_zones" "this" {
   state = "available"
 }
@@ -7,27 +16,33 @@ data "aws_availability_zones" "this" {
 resource "aws_vpc" "this" {
   cidr_block = var.cidr
   tags = {
-    Name = var.vpc_name
+    Name = var.name
   }
 }
 
-#####
+###########################################
+#
 # Internet gateway created only when the user
 # defines public subnets
+#
+###########################################
 
 resource "aws_internet_gateway" "this" {
     count = length(var.public_subnets) > 0 ? 1 : 0
     vpc_id = aws_vpc.this.id
     tags = {
-        Name = "${var.vpc_name}-igw"
+        Name = "${var.name}-igw"
     }
 }
 
-#####
+########################################
+#
 # A route table with a route
 # to the Internet Gateway
 # will be created only when the user
 # defines public subnets
+#
+########################################
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
@@ -36,7 +51,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.this[0].id
     }
   tags = {
-    Name = "${var.vpc_name}-public-rt"
+    Name = "${var.name}-public-rt"
   }
 }
 
@@ -47,6 +62,7 @@ resource "aws_route_table" "public" {
 # to be created in the VPC
 #
 ######################################
+
 resource "aws_subnet" "public_subnets" {
   count = length(var.public_subnets)
   vpc_id            = aws_vpc.this.id
@@ -54,7 +70,7 @@ resource "aws_subnet" "public_subnets" {
   cidr_block        = var.public_subnets[count.index].cidr
   map_public_ip_on_launch = var.auto_assign_public_ip
   tags = {
-    Name = "${var.vpc_name}-pub-subnet-${count.index}"
+    Name = "${var.name}-pub-subnet-${count.index}"
   }
 }
 
@@ -70,12 +86,13 @@ resource "aws_route_table_association" "publics" {
 # to be created in the VPC
 #
 ########################################
+
 resource "aws_subnet" "private_subnets" {
     count = length(var.private_subnets)
     vpc_id = aws_vpc.this.id
     availability_zone = var.private_subnets[count.index].az
     cidr_block = var.private_subnets[count.index].cidr
     tags = {
-        Name = "${var.vpc_name}-prvt-subnet-${count.index}"
+        Name = "${var.name}-prvt-subnet-${count.index}"
     }
 }
