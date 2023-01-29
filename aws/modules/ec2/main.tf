@@ -65,7 +65,7 @@ resource "aws_key_pair" "this" {
 resource "aws_instance" "this" {
   count = var.instance_count
 
-  ami                  = "ami-03dbf0c122cb6cf1d" # Amazon Linux AMI
+  ami                  = var.ami
   key_name             = aws_key_pair.this.key_name
   instance_type        = var.instance_type
   vpc_security_group_ids  = var.use_default_sg ? concat([aws_security_group.default_sg[0].id], var.security_group_ids) : var.security_group_ids

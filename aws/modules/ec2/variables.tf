@@ -10,6 +10,12 @@ variable "instance_type" {
     default = "t2.small"
 }
 
+variable "ami" {
+    type = string
+    description = "AMI. Default to Amazon Linux"
+    default = "ami-03dbf0c122cb6cf1d"
+}
+
 variable "pub_key_path" {
     type = string
     description = "Path to a public key"
