@@ -9,7 +9,7 @@ terraform {
 }
 
 module "vpc" {
-    source = "../../modules/vpc"
+    source = "../../../modules/vpc"
     name = "my_vpc"
     cidr = "10.0.0.0/16"
     public_subnets = [{ 
@@ -23,13 +23,13 @@ module "vpc" {
 }
 
 module "pvt-instance" {
-    source = "../../modules/ec2"
+    source = "../../../modules/ec2"
     instance_count = 3
     
     ami = "ami-00874d747dde814fa"
-    name = "pvt-instance"
+    name = "my-instance"
     pub_key_path = "${path.module}/aws.pub"
-    subnet_ids = module.vpc.private_subnet_ids
+    subnet_ids = module.vpc.public_subnet_ids
     default_vpc = false
     vpc_id = module.vpc.vpc_id
 }
