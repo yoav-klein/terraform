@@ -1,3 +1,13 @@
+#
+#
+#   A configuration to create the following infrastructure:
+#
+#   * VPC with a private subnet, and 2 public subnets. 2 because
+#     this is the minimum required for Application Load Balancer
+#   * EC2 instance (one or more)
+#   * Application Load Balancer 
+#   * Connects the EC2 instance(s) to the load balancer
+#
 
 
 terraform {
@@ -13,7 +23,7 @@ provider "aws" {}
 
 
 locals {
-    instance_count = 2
+    instance_count = 1
 }
 
 data "aws_availability_zones" "available" {
@@ -40,9 +50,10 @@ module "vpc" {
 }
 
 module "ec2" {
-    source = "../../modules/ec2"
-
-    pub_key_path = "${path.module}/key.pub"
+    source = "../../../modules/ec2"
+    
+    name = "my-server"
+    pub_key_path = "${path.module}/aws.pub"
 
     default_vpc = false
     vpc_id = module.vpc.vpc_id
@@ -51,7 +62,7 @@ module "ec2" {
 }
 
 module "alb" {
-    source = "../../modules/load-balancer"
+    source = "../../../modules/load-balancer"
     
     name = "my-alb"
     vpc_id = module.vpc.vpc_id
@@ -60,6 +71,7 @@ module "alb" {
 
 resource "aws_lb_target_group_attachment" "attachment" {
   count = local.instance_count
+
   target_group_arn = module.alb.target_group_arns[0]
   target_id        = module.ec2.instance_ids[count.index]
   port             = 80
