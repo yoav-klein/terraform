@@ -14,8 +14,8 @@ provider "aws" {}
 
 
 module "ec2" {
-    source = "../../modules/ec2"
-    name = "aurora-test"    
+    source = "../../../modules/ec2"
+    name = "my-server"    
     pub_key_path="${path.module}/aws.pub"
     instance_count = 1
     default_vpc = true
