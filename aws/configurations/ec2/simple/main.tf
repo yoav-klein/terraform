@@ -12,7 +12,6 @@ terraform {
 provider "aws" {}
 
 
-
 module "ec2" {
     source = "../../../modules/ec2"
     name = "my-server"    
@@ -20,4 +19,9 @@ module "ec2" {
     instance_count = 1
     default_vpc = true
     
+}
+
+output "public_dns" {
+    description = "public DNS"
+    value = module.ec2.public_dns
 }
