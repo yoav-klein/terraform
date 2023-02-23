@@ -1,3 +1,0 @@
-[submodule "aws/configurations/opensearch/with-access-policy/elasticsearch"]
-	path = aws/configurations/opensearch/with-access-policy/elasticsearch
-	url = https://github.com/yoav-klein/elasticsearch
