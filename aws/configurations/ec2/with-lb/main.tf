@@ -57,7 +57,7 @@ module "ec2" {
 
     default_vpc = false
     vpc_id = module.vpc.vpc_id
-    subnet_ids = module.vpc.private_subnets
+    subnet_ids = module.vpc.public_subnets
     instance_count = local.instance_count
 }
 
