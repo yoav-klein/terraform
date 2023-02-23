@@ -1,0 +1,3 @@
+[submodule "aws/configurations/opensearch/elasticsearch"]
+	path = aws/configurations/opensearch/elasticsearch
+	url = https://github.com/yoav-klein/elasticsearch
