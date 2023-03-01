@@ -1,6 +1,8 @@
+
+
 resource "aws_cloudwatch_dashboard" "main" {
 
-  dashboard_name = "my-dashboard"
+  dashboard_name = "OpenSearch-${resource.aws_opensearch_domain.this.domain_name}"
 
   dashboard_body = <<EOF
 {
@@ -17,21 +19,19 @@ resource "aws_cloudwatch_dashboard" "main" {
             "AWS/ES",
             "CPUUtilization",
             "DomainName",
-            "test-domain",
+            "${var.domain}",
             "ClientId",
-            "791437181286"
+            "${data.aws_caller_identity.current.account_id}"
           ]
         ],
         "period": 300,
         "region": "us-east-1",
         "stat": "Average",
-        "title": "OpenSearch Instance CPU"
+        "title": "CPUUtilization"
       }
     },
     {
       "type": "metric",
-      "x": 0,
-      "y": 0,
       "width": 6,
       "height": 6,
       "properties": {
@@ -40,21 +40,19 @@ resource "aws_cloudwatch_dashboard" "main" {
             "AWS/ES",
             "IndexingRate",
             "DomainName",
-            "test-domain",
+            "${var.domain}",
             "ClientId",
-            "791437181286"
+            "${data.aws_caller_identity.current.account_id}"
           ]
         ],
         "period": 300,
         "region": "us-east-1",
         "stat": "Average",
-        "title": "OpenSearch Indexing Rate"
+        "title": "IndexingRate"
       }
     },
     {
       "type": "metric",
-      "x": 0,
-      "y": 0,
       "width": 6,
       "height": 6,
       "properties": {
@@ -63,9 +61,9 @@ resource "aws_cloudwatch_dashboard" "main" {
             "AWS/ES",
             "JVMMemoryPressure",
             "DomainName",
-            "test-domain",
+            "${var.domain}",
             "ClientId",
-            "791437181286"
+            "${data.aws_caller_identity.current.account_id}"
           ]
         ],
         "period": 300,
@@ -76,8 +74,6 @@ resource "aws_cloudwatch_dashboard" "main" {
     },
     {
       "type": "metric",
-      "x": 0,
-      "y": 0,
       "width": 6,
       "height": 6,
       "properties": {
@@ -86,15 +82,57 @@ resource "aws_cloudwatch_dashboard" "main" {
             "AWS/ES",
             "FreeStorageSpace",
             "DomainName",
-            "test-domain",
+            "${var.domain}",
             "ClientId",
-            "791437181286"
+            "${data.aws_caller_identity.current.account_id}"
           ]
         ],
         "period": 300,
         "region": "us-east-1",
         "stat": "Average",
-        "title": "Free Storage Space"
+        "title": "FreeStorageSpace"
+      }
+    },
+    {
+      "type": "metric",
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [ 
+          [
+            "AWS/ES",
+            "SearchRate",
+            "DomainName",
+            "${var.domain}",
+            "ClientId",
+            "${data.aws_caller_identity.current.account_id}"
+          ]
+        ],
+        "period": 300,
+        "region": "us-east-1",
+        "stat": "Average",
+        "title": "SearchRate"
+      }
+    },
+     {
+      "type": "metric",
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [ 
+          [
+            "AWS/ES",
+            "ClusterUsedSpace",
+            "DomainName",
+            "${var.domain}",
+            "ClientId",
+            "${data.aws_caller_identity.current.account_id}"
+          ]
+        ],
+        "period": 300,
+        "region": "us-east-1",
+        "stat": "Average",
+        "title": "ClusterUserSpace"
       }
     }
 
