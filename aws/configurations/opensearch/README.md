@@ -13,6 +13,11 @@ a resource-based policy.
 After deploying a domain, you can use the `elasticsearch` repository
 to work against the domain.
 
+Run
+```
+$ export ELASTIC_HOST=$(../../../run_tf.sh output -raw endpoint)
+```
+
 ## elasticsearch submodule
 The `elasticsearch` folder is a submodule which contains
 some utility code for operating Elasticsearch clusters.
