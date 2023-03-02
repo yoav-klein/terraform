@@ -114,7 +114,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         "title": "SearchRate"
       }
     },
-     {
+    {
       "type": "metric",
       "width": 6,
       "height": 6,
@@ -134,7 +134,29 @@ resource "aws_cloudwatch_dashboard" "main" {
         "stat": "Average",
         "title": "ClusterUserSpace"
       }
+    }, 
+    {
+      "type": "metric",
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [ 
+          [
+            "AWS/ES",
+            "SearchableDocuments",
+            "DomainName",
+            "${var.domain}",
+            "ClientId",
+            "${data.aws_caller_identity.current.account_id}"
+          ]
+        ],
+        "period": 300,
+        "region": "us-east-1",
+        "stat": "Average",
+        "title": "SearchbleDocuments"
+      }
     }
+
 
 
   ]
