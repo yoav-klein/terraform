@@ -23,7 +23,8 @@ If `public_subnets` specified:
 
 | Name | Type | Description |
 | --- | --- | --- |
-| vpc_id | `string` | Name tag for the VPC |
+| name | `string` | Name tag for the VPC |
+| cidr | `string` | CIDR block for the VPC |
 | public_subnets | `list(object)` | List of public subnets, see below |
 | private_subnets | `list(object)` | List of private subnets, see below |
 | auto_assign_public_ip | `bool` | Whether or not to assign IP address for instance in the subnet |
