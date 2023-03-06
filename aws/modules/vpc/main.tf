@@ -15,6 +15,7 @@ data "aws_availability_zones" "this" {
 
 resource "aws_vpc" "this" {
   cidr_block = var.cidr
+  enable_dns_hostnames = true # why not?
   tags = {
     Name = var.name
   }
