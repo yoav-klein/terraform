@@ -70,6 +70,7 @@ resource "aws_instance" "this" {
   instance_type        = var.instance_type
   vpc_security_group_ids  = var.use_default_sg ? concat([aws_security_group.default_sg[0].id], var.security_group_ids) : var.security_group_ids
   subnet_id = var.default_vpc ?  data.aws_subnets.default_subnets.ids[count.index % length(data.aws_subnets.default_subnets)] : var.subnet_ids[count.index % length(var.subnet_ids)]
+  user_data = var.user_data
 
   tags = {
     Name = "${var.name}-${count.index}"

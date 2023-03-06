@@ -51,6 +51,12 @@ variable "use_default_sg" {
     default = true
 }
 
+variable "user_data" {
+    type = string
+    description = "Script to launch on instance creation"
+    default = ""
+}
+
 variable "security_group_ids" {
     default = []
     description = "List of security groups to associate with the insatces"
