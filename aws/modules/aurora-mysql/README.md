@@ -27,6 +27,7 @@ See example usage [here](https://github.com/yoav-klein/terraform/tree/master/aws
 | instance_class  | `string` | default: `db.t3.small` |
 | num_instances | `number` | Number of instances, including primary and replicas, default: 3 |
 | port | `number` | Port number for connections, default: 3306 |
+| publicly_accessible | `bool` | expose the instances publicly |
 | username | `string` | Username for master user. default: `admin` |
 | password | `string` | Password for master user |
 | vpc_id | `string` | VPC ID to deploy the cluster in |
