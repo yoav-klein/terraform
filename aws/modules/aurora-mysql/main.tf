@@ -9,7 +9,7 @@ terraform {
 }
 
 
-resource "aws_security_group" "this" {
+resource "aws_security_group" "public" {
   name = "${var.name}-sg"
   vpc_id = var.vpc_id
 
@@ -39,7 +39,7 @@ resource "aws_rds_cluster" "this" {
   engine_version = "5.7.mysql_aurora.2.11.1"
   master_username = var.username
   master_password = var.password
-  vpc_security_group_ids = [aws_security_group.this.id]
+  vpc_security_group_ids = var.publicly_accessible ? [aws_security_group.public.id] : var.security_group_ids
   skip_final_snapshot = true
 }
 
@@ -47,7 +47,7 @@ resource "aws_rds_cluster_instance" "this" {
     count = var.num_instances
 
     identifier = "example-instance${count.index}"
-    publicly_accessible = true
+    publicly_accessible = var.publicly_accessible
     cluster_identifier = aws_rds_cluster.this.id
     instance_class = var.instance_class
     engine = aws_rds_cluster.this.engine

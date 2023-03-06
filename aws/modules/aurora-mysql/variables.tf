@@ -16,10 +16,22 @@ variable "num_instances" {
     default = 3
 }   
 
+variable "security_group_ids" {
+    description = "List of security groups to attach to cluster"
+    type = list(string)
+    default = []
+}
+
 variable "port" {
     description = "Port number"
     type = number
     default = 3306
+}
+
+variable "publicly_accessible" {
+    description = "Should the cluster be publicly accessible"
+    type = bool
+    default = false
 }
 
 variable "username" {
