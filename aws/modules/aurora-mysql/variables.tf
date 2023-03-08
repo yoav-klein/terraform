@@ -4,6 +4,11 @@ variable "name" {
     type = string
 }
 
+variable "engine_version" {
+    description = "example: 5.7.mysql_aurora.2.11.1"
+    type = string
+}
+
 variable "instance_class" {
     description = "Instance class of the nodes"
     type = string

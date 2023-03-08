@@ -36,7 +36,7 @@ resource "aws_rds_cluster" "this" {
   port = var.port
   engine = "aurora-mysql"
   engine_mode = "provisioned"
-  engine_version = "5.7.mysql_aurora.2.11.1"
+  engine_version = var.engine_version
   master_username = var.username
   master_password = var.password
   vpc_security_group_ids = var.publicly_accessible ? [aws_security_group.public.id] : var.security_group_ids
