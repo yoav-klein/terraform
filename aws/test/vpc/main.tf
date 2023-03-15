@@ -12,7 +12,7 @@ provider "aws" {
 }
 module "vpc" {
   source   = "../../modules/vpc"
-  vpc_name = "my_test_vpc"
+  name = "my_test_vpc"
   cidr     = "10.0.0.0/16"
   public_subnets = [{
     az   = "us-east-1b"
