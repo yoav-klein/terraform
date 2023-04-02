@@ -1,30 +1,12 @@
 # WAF
 ---
 
-This configuration demonstrates the use of AWS WAF.
+These configurations contain demonstrations of WAF.
 
-This configuration creates the following resources:
-* S3 bucket
-* CloudFront distribution which serves this bucket
-* WAF web ACL
-  * IP set
+In these confiurations, we create a S3 bucket with some content, and a 
+CloudFront distribution which serves this S3 bucket.
 
-So we create a CloudFront disribution which serves the S3 bucket,
-so we can access the bucket's contents using the distribution, and
-we associate the web ACL with the CloudFront distribution.
+In each configuration, we'll create a WAF web ACL with different configurations to 
+demonstrate different capabilities and features.
 
-The web ACL has one rule, which blocks traffic from the IP of this machine.
 
-## Usage
-After creating the resources with `tf apply`, run:
-
-```
-$ . test.sh
-$ setup
-$ test
-```
-
-And you will see that you can't access the resource.
-
-On the other hand, take the URL of the CloudFront distribution and try to access it
-from another machine
