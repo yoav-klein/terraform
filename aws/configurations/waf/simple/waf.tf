@@ -25,7 +25,7 @@ resource "aws_wafv2_web_acl" "this" {
   scope = "CLOUDFRONT"
 
   rule {
-    name = "BlockIP"
+    name = "BlockMyIP"
     action {
       block {}
     }
@@ -37,7 +37,7 @@ resource "aws_wafv2_web_acl" "this" {
     }
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "BlockRule"
+      metric_name                = "BlockMyIP"
       sampled_requests_enabled   = true
     }
   }
@@ -45,7 +45,7 @@ resource "aws_wafv2_web_acl" "this" {
   visibility_config {
     # whether the associated resource sends metrics to CloudWatch
     cloudwatch_metrics_enabled = true
-    metric_name                = "MyWaf"
+    metric_name                = "MyWafMetric"
     sampled_requests_enabled   = true
   }
 
