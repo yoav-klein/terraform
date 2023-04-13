@@ -1,0 +1,29 @@
+export AWS_ACCESS_KEY_ID=AKIA5NBJYKEZ2BH3WBPA
+export AWS_SECRET_ACCESS_KEY=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
+export AWS_REGION=us-east-1
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+alias tf="$SCRIPT_DIR/run_tf.sh"
+
+function clean() {
+    read -p "Delete state files? y/n" -n 1 -r
+    echo
+    if [ $REPLY == "y" ]; then
+        rm -f terraform.tfstate*
+    fi
+}
+
+function cd_and_remove_terraform() {
+  for dir in * ; do
+    if [ -d $dir ]; then
+        if [[ -d "$dir/.terraform" ]]; then
+            echo "Removing $dir.terraform directory"
+            sudo rm -rf "$dir/.terraform"
+        else
+            cd "$dir"
+            cd_and_remove_terraform
+            cd ..
+        fi
+    fi
+  done
+}
