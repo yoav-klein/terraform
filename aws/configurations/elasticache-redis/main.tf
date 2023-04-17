@@ -38,6 +38,16 @@ resource "aws_elasticache_subnet_group" "this" {
     
 }
 
+resource "aws_elasticache_parameter_group" "this" {
+  name   = "cache-params"
+  family = "redis7"
+
+  parameter {
+    name  = "notify-keyspace-events"
+    value = "Ex"
+  }
+}
+
 resource "aws_elasticache_replication_group" "this" {
     replication_group_id = "my-redis-cluster"
     description = "Example cluster"
@@ -54,6 +64,7 @@ resource "aws_elasticache_replication_group" "this" {
     num_cache_clusters = 3
     security_group_ids = [aws_security_group.redis_ec2.id]
     auto_minor_version_upgrade = true
+    parameter_group_name = aws_elasticache_parameter_group.this.name
     #transit_encryption_enabled = true
     #at_rest_encryption_enabled = true
     
