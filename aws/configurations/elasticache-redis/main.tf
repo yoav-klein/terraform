@@ -22,10 +22,13 @@ module "vpc" {
     {
       az   = "us-east-1c"
       cidr = "10.0.2.0/24"
+    },{
+      az   = "us-east-1d"
+      cidr = "10.0.3.0/24"
   }]
   public_subnets = [{
     az   = "us-east-1a",
-    cidr = "10.0.3.0/24"
+    cidr = "10.0.4.0/24"
   }]
 }
 
