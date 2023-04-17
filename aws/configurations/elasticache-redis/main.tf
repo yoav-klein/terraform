@@ -52,10 +52,10 @@ resource "aws_elasticache_replication_group" "this" {
     subnet_group_name = aws_elasticache_subnet_group.this.name
     # num_cache_clusters in the number of nodes in the cluster
     num_cache_clusters = 3
-    security_group_ids = [aws_security_group.redis_sg.id]
+    security_group_ids = [aws_security_group.redis_ec2.id]
     auto_minor_version_upgrade = true
-    transit_encryption_enabled = true
-    at_rest_encryption_enabled = true
+    #transit_encryption_enabled = true
+    #at_rest_encryption_enabled = true
     
 }
 

@@ -10,7 +10,7 @@ module "ec2" {
     subnet_ids = module.vpc.public_subnet_ids
     default_vpc = false
     use_default_sg = true
-    security_group_ids = [aws_security_group.ec2_sg.id]    
+    security_group_ids = [aws_security_group.ec2_redis.id]    
     vpc_id = module.vpc.vpc_id
 }
 
