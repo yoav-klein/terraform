@@ -34,6 +34,6 @@ $ redis-cli -h <redis_hostname_outputted_from_terraform>
 
 5. Create and read a key:
 ```
-redis> SET name=yoav
+redis> SET name yoav
 redis> GET name
 ```
