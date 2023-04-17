@@ -1,11 +1,11 @@
 
 resource "aws_security_group" "redis_sg" {
-    name = "rds-ec2"
+    name = "redis-sg"
     vpc_id = module.vpc.vpc_id
 }
 
 resource "aws_security_group" "ec2_sg" {
-    name = "ec2-rds"
+    name = "ec2-sg"
     vpc_id = module.vpc.vpc_id
 }
 
