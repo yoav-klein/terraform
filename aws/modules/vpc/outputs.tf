@@ -15,3 +15,7 @@ output "vpc_id" {
     value = aws_vpc.this.id
 }
 
+output "default_route_table_id" {
+    description = "Default route table ID"
+    value = aws_vpc.this.default_route_table_id
+}
