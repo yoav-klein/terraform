@@ -63,7 +63,7 @@ resource "aws_iam_role" "developer" {
 #################################################
 
 resource "aws_s3_bucket" "this" {
-  bucket = "my-tf-test-bucket-yoav"
+  bucket = "my-tf-test-bucket-yoav12"
 
   tags = {
     Name        = "My bucket"
