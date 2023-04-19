@@ -30,35 +30,35 @@ resource "aws_wafv2_web_acl" "this" {
       block {}
     }
     priority = 1
- 
+
     statement {
-        and_statement {
-            statement {
-                ip_set_reference_statement {
-                    arn = aws_wafv2_ip_set.this.arn
-                }
-            }
-            statement {
-                byte_match_statement {
-                    field_to_match {
-                        headers {
-                            match_pattern {
-                                included_headers = ["X-test"]
-                            }
-                            match_scope = "VALUE"
-                            oversize_handling = "CONTINUE"
-                        
-                        }
-                    }
-                    positional_constraint = "EXACTLY"
-                    search_string = "kuku"
-                    text_transformation {
-                        priority = 0
-                        type = "NONE"
-                    }
-                }
-            }
+      and_statement {
+        statement {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.this.arn
+          }
         }
+        statement {
+          byte_match_statement {
+            field_to_match {
+              headers {
+                match_pattern {
+                  included_headers = ["X-test"]
+                }
+                match_scope       = "VALUE"
+                oversize_handling = "CONTINUE"
+
+              }
+            }
+            positional_constraint = "EXACTLY"
+            search_string         = "kuku"
+            text_transformation {
+              priority = 0
+              type     = "NONE"
+            }
+          }
+        }
+      }
     }
     visibility_config {
       cloudwatch_metrics_enabled = true
