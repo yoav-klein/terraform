@@ -23,6 +23,11 @@ All you need to do is annotate a service account with the role ARN that you want
 ### Run Terraform
 Run the terraform code: `tf apply -auto-approve`
 
+### Configure kubeconfig
+```
+$ ../configure_kubeconfig.sh
+```
+
 ### Upload content to S3, and apply a pod
 source the `test.sh` file, and run `setup`
 ```
