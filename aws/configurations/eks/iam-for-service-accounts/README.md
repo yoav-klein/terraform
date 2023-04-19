@@ -39,6 +39,7 @@ This uploads a file to the S3 bucket, and creates the pod with the ServiceAccoun
 who will have permissions to the bucket.
 
 ### Test
+Wait a minute for the pod to start, and then
 Run
 ```
 $ test
