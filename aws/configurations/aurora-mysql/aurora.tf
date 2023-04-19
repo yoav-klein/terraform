@@ -4,7 +4,8 @@ module "mysql_cluster" {
     source = "../../modules/aurora-mysql"
     
     name = "example"
-    engine_version = "5.7.mysql_aurora.2.11.1"
+    num_instances = 3
+    engine_version = "5.7.mysql_aurora.2.11.2"
     vpc_id = module.vpc.vpc_id
     subnet_ids = module.vpc.private_subnet_ids
     security_group_ids = [aws_security_group.rds_ec2.id]
