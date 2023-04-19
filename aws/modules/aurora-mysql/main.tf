@@ -41,6 +41,7 @@ resource "aws_rds_cluster" "this" {
   master_password = var.password
   vpc_security_group_ids = var.publicly_accessible ? [aws_security_group.public.id] : var.security_group_ids
   skip_final_snapshot = true
+  apply_immediately = true
 }
 
 resource "aws_rds_cluster_instance" "this" {
