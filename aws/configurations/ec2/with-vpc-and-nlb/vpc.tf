@@ -3,7 +3,7 @@
 #############################################
 
 
-# VPC with 2 private subnets, and 1 public
+# VPC with 2 private subnets, and 2 public subnets
 module "vpc" {
   source   = "../../../modules/vpc"
   name = "my-vpc"
@@ -28,20 +28,20 @@ module "vpc" {
 }
 
 # EIP for the NAT Gateway
-resource "aws_eip" "this" {
-    vpc = true
-}
+#resource "aws_eip" "this" {
+#    vpc = true
+#}
 
-resource "aws_nat_gateway" "this" {
-  allocation_id     = aws_eip.this.allocation_id
-  connectivity_type = "public"
-  subnet_id         = module.vpc.public_subnet_ids[0]
-}
+#resource "aws_nat_gateway" "this" {
+#  allocation_id     = aws_eip.this.allocation_id
+#  connectivity_type = "public"
+#  subnet_id         = module.vpc.public_subnet_ids[0]
+#}
 
-resource "aws_route" "route_to_nat_gateway" {
-    route_table_id = module.vpc.default_route_table_id
-    destination_cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.this.id
-}
+#resource "aws_route" "route_to_nat_gateway" {
+#    route_table_id = module.vpc.default_route_table_id
+#    destination_cidr_block = "0.0.0.0/0"
+#    gateway_id = aws_nat_gateway.this.id
+#}
 
 
