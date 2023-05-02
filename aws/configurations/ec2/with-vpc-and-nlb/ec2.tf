@@ -48,6 +48,7 @@ resource "aws_security_group" "servers" {
 
 module "ec2_servers" {
     source = "../../../modules/ec2"
+
     name = "nginx-server"    
     ami = local.amis["ubuntu"]
     pub_key_path="${path.module}/aws.pub"
