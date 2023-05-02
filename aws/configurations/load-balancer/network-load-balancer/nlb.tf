@@ -43,3 +43,7 @@ resource "aws_lb_target_group_attachment" "this" {
   #port            = 5000
 }
 
+output "nlb-domain-name" {
+    description = "Domain name of the Network Load Balancer"
+    value = aws_lb.this.dns_name
+}
