@@ -61,7 +61,7 @@ module "ec2_servers" {
     user_data = <<EOF
 #!/bin/bash
 curl -L get.docker.com | bash
-docker run -d -p 5000:5000 yoavklein3/echo:0.1
+docker run --network host yoavklein3/echo:0.1
 EOF    
 }
 

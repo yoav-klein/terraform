@@ -5,7 +5,6 @@ resource "aws_lb" "this" {
   load_balancer_type = "network"
   subnets            = module.vpc.public_subnet_ids
 
-  enable_deletion_protection = true
 
   tags = {
     Environment = "production"
