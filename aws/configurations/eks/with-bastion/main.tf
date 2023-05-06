@@ -76,7 +76,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "cluster_role" {
-  name               = "eks-cluster-example"
+  name               = "EKSClusterRole"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
@@ -88,7 +88,7 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 resource "aws_eks_cluster" "this" {
     name = "my-cluster"
     role_arn = aws_iam_role.cluster_role.arn
-    version = "1.24"
+    version = "1.22"
     
     vpc_config {
         subnet_ids = module.vpc.private_subnet_ids
@@ -115,7 +115,7 @@ resource "aws_eks_cluster" "this" {
 #####################################
 
 resource "aws_iam_role" "node_role" {
-  name = "EKSNodeRole"
+  name = "EKSNodeRole1"
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -163,6 +163,11 @@ resource "aws_eks_node_group" "this" {
     instance_types = ["t3.medium"]
     node_group_name = "my-node-group"
     
+    # want to allow SSH to the machines
+    remote_access {
+        ec2_ssh_key = module.bastion.key_pair_name
+    }
+
     depends_on = [
         aws_iam_role_policy_attachment.worker_node_policy,
         aws_iam_role_policy_attachment.cni_policy,
