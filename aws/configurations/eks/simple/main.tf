@@ -85,10 +85,15 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
   role       = aws_iam_role.cluster_role.name
 }
 
+locals {
+    kubernetes_version = "1.24"
+}
+
+
 resource "aws_eks_cluster" "this" {
     name = "my-cluster"
     role_arn = aws_iam_role.cluster_role.arn
-    version = "1.24"
+    version = local.kubernetes_version
     
     vpc_config {
         subnet_ids = module.vpc.private_subnet_ids
@@ -151,9 +156,10 @@ resource "aws_iam_role_policy_attachment" "ecr_policy" {
 resource "aws_eks_node_group" "this" {
     cluster_name = aws_eks_cluster.this.name
     node_role_arn = aws_iam_role.node_role.arn
-
+    
+    version = local.kubernetes_version
     scaling_config {
-        desired_size = 2
+        desired_size = 3
         max_size = 10
         min_size = 1
     }
@@ -171,6 +177,10 @@ resource "aws_eks_node_group" "this" {
     ]
 
 }
+
+######################################
+# outputs
+######################################
 
 output "endpoint" {
     value = aws_eks_cluster.this.endpoint
