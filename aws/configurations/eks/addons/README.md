@@ -36,19 +36,15 @@ $ ../configure_kubeconfig.sh
 ```
 
 ### Run the demo application
+This creates a PersistentVolumeClaim, which will dynamically provision a EBS volume in our AWS account.
+Also, we create 2 pods which use this PersistentVolumeClaim: `write-app`, which writes to the volume,
+and `read-pod` which reads from it.
+
 ```
 $ kubectl apply -f demo/
 ```
-
-
-This uploads a file to the S3 bucket, and creates the pod with the ServiceAccount
-who will have permissions to the bucket.
-
-### Test
-Wait a minute for the pod to start, and then
-Run
+wait a minute for the pods to run. Then, check if you see what's written by the `write-app` using the `read-app`:
 ```
-$ test
+$ kubectl exec read-app -- cat /data/out.txt
 ```
 
-This will have the pod accessing the S3 bucket.
