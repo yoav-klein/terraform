@@ -16,4 +16,7 @@ terraform {
 
 provider "aws" { }
 
-
+provider "kubectl" {
+    config_path = "~/.kube/config"
+    config_context = aws_eks_cluster.this.arn
+}
