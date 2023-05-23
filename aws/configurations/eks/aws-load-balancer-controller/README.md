@@ -55,11 +55,20 @@ $ ../configure_kubeconfig.sh
 ```
 
 ### Test
-Wait a minute for the pod to start, and then
-Run
+
+Apply the manifest in the `demo-app` directory:
 ```
-$ test
+$ kubectl apply -f demo-app/
 ```
+
+This will create a Nginx Deployment and Service. Notice that the Service is annotated so that the AWS Load Balancer Controller
+will pick it up.
+
+Wait a few mins so that the Load Balancer will be Active, and then curl it:
+```
+$ curl $(kubectl get svc nginx-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+```
+
 
 ## Technical Notes
 * We create the `cert-manager` namespace before applying the full YAML of cert-manager. It seems that if you don't do this,
