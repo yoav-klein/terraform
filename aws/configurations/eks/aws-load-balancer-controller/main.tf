@@ -7,17 +7,17 @@
 ##########################################################
 
 module "vpc" {
-  source   = "../../../modules/vpc"
-  name = "k8s-vpc"
-  cidr     = "10.0.0.0/16"
+  source = "../../../modules/vpc"
+  name   = "k8s-vpc"
+  cidr   = "10.0.0.0/16"
   private_subnets = [{
-        az   = "us-east-1b"
-        cidr = "10.0.1.0/24"
+    az   = "us-east-1b"
+    cidr = "10.0.1.0/24"
     },
     {
       az   = "us-east-1c"
       cidr = "10.0.2.0/24"
-    }]
+  }]
   public_subnets = [{
     az   = "us-east-1a",
     cidr = "10.0.3.0/24"
@@ -25,20 +25,20 @@ module "vpc" {
 }
 
 resource "aws_eip" "this" {
-    vpc = true
+  vpc = true
 }
 
 
 resource "aws_nat_gateway" "this" {
-  allocation_id = aws_eip.this.allocation_id
+  allocation_id     = aws_eip.this.allocation_id
   connectivity_type = "public"
   subnet_id         = module.vpc.public_subnet_ids[0]
 }
 
 resource "aws_route" "route_to_nat_gateway" {
-    route_table_id = module.vpc.default_route_table_id
-    destination_cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.this.id
+  route_table_id         = module.vpc.default_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_nat_gateway.this.id
 }
 
 
@@ -75,25 +75,25 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 ########################################################
 
 locals {
-    kubernetes_version = "1.24"
+  kubernetes_version = "1.24"
 }
 
 resource "aws_eks_cluster" "this" {
-    name = "my-cluster"
-    role_arn = aws_iam_role.cluster_role.arn
-    version = local.kubernetes_version
-    
-    vpc_config {
-        subnet_ids = module.vpc.private_subnet_ids
-        endpoint_private_access = true
-        endpoint_public_access = true
-    }
-    
+  name     = "my-cluster"
+  role_arn = aws_iam_role.cluster_role.arn
+  version  = local.kubernetes_version
 
-    depends_on = [
-        aws_iam_role_policy_attachment.cluster_policy_attachment
-    ]
-    
+  vpc_config {
+    subnet_ids              = module.vpc.private_subnet_ids
+    endpoint_private_access = true
+    endpoint_public_access  = true
+  }
+
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cluster_policy_attachment
+  ]
+
 }
 
 
@@ -123,18 +123,18 @@ resource "aws_iam_role" "node_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "worker_node_policy" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-    role = aws_iam_role.node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.node_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "cni_policy" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-    role = aws_iam_role.node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.node_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "ecr_policy" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-    role = aws_iam_role.node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.node_role.name
 }
 
 #####################################
@@ -142,31 +142,31 @@ resource "aws_iam_role_policy_attachment" "ecr_policy" {
 ####################################
 
 resource "aws_eks_node_group" "this" {
-    cluster_name = aws_eks_cluster.this.name
-    node_role_arn = aws_iam_role.node_role.arn
+  cluster_name  = aws_eks_cluster.this.name
+  node_role_arn = aws_iam_role.node_role.arn
 
-    version = local.kubernetes_version
-    scaling_config {
-        desired_size = 2
-        max_size = 10
-        min_size = 1
-    }
+  version = local.kubernetes_version
+  scaling_config {
+    desired_size = 2
+    max_size     = 10
+    min_size     = 1
+  }
 
-    subnet_ids = module.vpc.private_subnet_ids
-    disk_size = 20
-    instance_types = ["t3.medium"]
-    node_group_name = "my-node-group"
-    
-    depends_on = [
-        aws_iam_role_policy_attachment.worker_node_policy,
-        aws_iam_role_policy_attachment.cni_policy,
-        aws_iam_role_policy_attachment.ecr_policy,
-        aws_nat_gateway.this        
-    ]
+  subnet_ids      = module.vpc.private_subnet_ids
+  disk_size       = 20
+  instance_types  = ["t3.medium"]
+  node_group_name = "my-node-group"
+
+  depends_on = [
+    aws_iam_role_policy_attachment.worker_node_policy,
+    aws_iam_role_policy_attachment.cni_policy,
+    aws_iam_role_policy_attachment.ecr_policy,
+    aws_nat_gateway.this
+  ]
 
 }
 
 output "endpoint" {
-    value = aws_eks_cluster.this.endpoint
+  value = aws_eks_cluster.this.endpoint
 }
 

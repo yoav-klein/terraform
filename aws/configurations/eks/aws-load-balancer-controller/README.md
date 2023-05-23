@@ -1,42 +1,58 @@
-# Elastic Kubernetes Service
+# AWS Load Balancer Controller
 ---
 
-This builds on the simple example, but this we deomnstrate the use of IAM for Service Accounts.
+In this configuration we install the AWS Load Balancer Controller in the EKS cluster.
 
-## Explanation
----
-### IAM Identity providers background
-In AWS IAM, we can configure a trust relationship between an external Identity provider and AWS account.
-This can be either a OIDC or SAML provider.
+The AWS Load Balancer Controller is a controller deployed in the EKS cluster which enables it
+to create Network Load Balancer and Application Load Balancers in AWS.
 
-Once you configure an OIDC provider, a user can access the AWS STS `AssumeRoleWithWebIdentity` API with an
-ID token issued by the Identity provider.
+Network Load Balancers are created for `Service` objects of type `LoadBalancer`
+Application Load Balancers are created for `Ingress` objects.
 
-### In EKS
-A EKS cluster provides an OIDC provider, which grants ID tokens to Service Accounts.
-All you need to do is annotate a service account with the role ARN that you want the pod to assume.
+## Resources created
+
+The regular resources are:
+
+* EKS cluster
+* EKS managed node group
+* IAM OIDC provider for the EKS cluster
+* Required IAM infrastructure
+
+The additional resources for the AWS Load Balancer Controller are:
+* IAM Policy for the AWS Load Balancer Controller
+* IAM Role for this policy
+
+This Role will be assumed by the AWS Load Balancer Controller pods using a ServiceAccount.
+
+The kubernetes manifests that we apply:
+* cert-manager
+* AWS Load Balancer Controller
+* IngressClass
+
+We get those YAMLs using the `get_manifests.sh` script.
+
+## Using the kubectl Provider
+
+In this configuration, we use the `kubectl` Terraform provider. This provider provides the
+`kubectl_manifest` resource, and the `kubectl_file_documents` data resource.
+
+Take a look at the `providers.tf` file to see how we configure this provider so it can access the cluster that we create.
 
 
 ## Usage
 ---
 
 ### Run Terraform
+First, generate the required YAML manifests using the `get_manifests.sh` script:
+```
+$ ./get_manifests.sh
+```
 Run the terraform code: `tf apply -auto-approve`
 
 ### Configure kubeconfig
 ```
 $ ../configure_kubeconfig.sh
 ```
-
-### Upload content to S3, and apply a pod
-source the `test.sh` file, and run `setup`
-```
-$ source test.sh
-$ setup
-```
-
-This uploads a file to the S3 bucket, and creates the pod with the ServiceAccount
-who will have permissions to the bucket.
 
 ### Test
 Wait a minute for the pod to start, and then
@@ -45,4 +61,7 @@ Run
 $ test
 ```
 
-This will have the pod accessing the S3 bucket.
+## Technical Notes
+* We create the `cert-manager` namespace before applying the full YAML of cert-manager. It seems that if you don't do this,
+  sometimes there's a race condition and it applies the resources out-of-order.
+

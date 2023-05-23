@@ -14,9 +14,9 @@ data "tls_certificate" "this" {
 
 
 resource "aws_iam_openid_connect_provider" "this" {
-  url = data.tls_certificate.this.url
+  url             = data.tls_certificate.this.url
   thumbprint_list = data.tls_certificate.this.certificates[*].sha1_fingerprint
-  client_id_list = ["sts.amazonaws.com"]
+  client_id_list  = ["sts.amazonaws.com"]
 }
 
 
