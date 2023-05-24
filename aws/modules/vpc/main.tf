@@ -73,9 +73,9 @@ resource "aws_subnet" "public_subnets" {
   availability_zone = var.public_subnets[count.index].az
   cidr_block        = var.public_subnets[count.index].cidr
   map_public_ip_on_launch = var.auto_assign_public_ip
-  tags = {
+  tags = merge({
     Name = "${var.name}-pub-subnet-${count.index}"
-  }
+  }, var.public_subnet_tags)
 }
 
 resource "aws_route_table_association" "publics" {
@@ -132,9 +132,9 @@ resource "aws_subnet" "private_subnets" {
     vpc_id = aws_vpc.this.id
     availability_zone = var.private_subnets[count.index].az
     cidr_block = var.private_subnets[count.index].cidr
-    tags = {
+    tags = merge({
         Name = "${var.name}-prvt-subnet-${count.index}"
-    }
+    }, var.private_subnet_tags)
 }
 
 # if there aren't any public subnets, leave the private subnets with the main route table

@@ -27,6 +27,18 @@ variable "private_subnets" {
     }))
 }
 
+variable "public_subnet_tags" {
+    default = {}
+    description = "Tags for the public subnets"
+    type = map(string)
+}
+
+variable "private_subnet_tags" {
+    default = {}
+    description = "Tags for the private subnets"
+    type = map(string)
+}
+
 variable "auto_assign_public_ip" {
     description = "Whether or not to enable auto-assign public IP in the subnet"
     default = true
