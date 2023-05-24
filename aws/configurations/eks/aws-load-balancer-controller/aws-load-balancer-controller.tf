@@ -74,7 +74,7 @@ metadata:
     name: cert-manager
 YAML
 
-  depends_on = [aws_eks_node_group.this] # time_sleep.wait_for_update_kubeconfig]
+  depends_on = [aws_eks_cluster.this]
 }
 
 resource "time_sleep" "wait_for_cert_manager_ns" {
@@ -118,7 +118,7 @@ metadata:
   namespace: kube-system
 YAML
 
-  depends_on = [aws_eks_node_group.this, aws_iam_role.aws_load_balancer_controller] #time_sleep.wait_for_update_kubeconfig, aws_iam_role.aws_load_balancer_controller]
+  depends_on = [aws_eks_cluster.this, aws_iam_role.aws_load_balancer_controller]
 }
 
 resource "kubectl_manifest" "aws_load_balancer_controller" {
