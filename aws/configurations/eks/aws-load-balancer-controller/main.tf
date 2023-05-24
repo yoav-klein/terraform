@@ -1,4 +1,8 @@
 
+locals {
+    cluster_name = "my-cluster"
+}
+
 ##########################################################
 # Create a VPC for the cluster
 
@@ -26,6 +30,15 @@ module "vpc" {
       az   = "us-east-1c",
       cidr = "10.0.4.0/24"
   }]
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = 1
+  }
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = 1
+  }
+
 }
 
 resource "aws_eip" "this" {
@@ -83,7 +96,7 @@ locals {
 }
 
 resource "aws_eks_cluster" "this" {
-  name     = "my-cluster"
+  name     = local.cluster_name
   role_arn = aws_iam_role.cluster_role.arn
   version  = local.kubernetes_version
 
