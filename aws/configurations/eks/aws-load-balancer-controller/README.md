@@ -54,11 +54,13 @@ Run the terraform code: `tf apply -auto-approve`
 $ ../configure_kubeconfig.sh
 ```
 
-### Test
 
-Apply the manifest in the `demo-app` directory:
+## Network Load Balancer
+
+Apply the manifest in the `demo-nlb` directory:
+
 ```
-$ kubectl apply -f demo-app/
+$ kubectl apply -f demo-nlb/
 ```
 
 This will create a Nginx Deployment and Service. Notice that the Service is annotated so that the AWS Load Balancer Controller
@@ -69,8 +71,26 @@ Wait a few mins so that the Load Balancer will be Active, and then curl it:
 $ curl $(kubectl get svc nginx-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 ```
 
+## Application Load Balancer
+In order to create an Application Load Balancer, apply the manifest in the `demo-alb` directory:
+```
+$ kubectl apply -f demo-alb/
+```
+
+In this example, we create 2 services in our cluster: `number-generator` and `name-generator`. Our Ingress
+will route traffic base on the HTTP path to each of the services.
+
+### Some notes
+* We use the `target-type: instance` in the `Ingress` resource. This will that 2 target groups with target type `Instance` will be created,
+  which will route traffic to the nodes in the cluster. Each target group will contain all the nodes in the cluster, but
+  will route to different ports - one for each NodePort of the 2 Services. When you use the `target-type: instance`, the backend
+  services must be of type `NodePort`. 
+  We could also use `target-type: ip`. In this case, the target groups would be of target type `IP`, and each target group would contain
+  the list of IPs of the pods of the Services, so that traffic would be load balanced between the pods directly, without going through the Service in between.
+
 
 ## Technical Notes
 * We create the `cert-manager` namespace before applying the full YAML of cert-manager. It seems that if you don't do this,
   sometimes there's a race condition and it applies the resources out-of-order.
+
 
