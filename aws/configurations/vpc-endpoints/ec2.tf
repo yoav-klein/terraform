@@ -118,11 +118,26 @@ resource "aws_instance" "bastion" {
   provisioner "file" {
       source = "aws"
       destination = "/home/ubuntu/aws"
+
+      connection {
+        type = "ssh"
+        user = "ubuntu"
+        host = self.public_dns
+        private_key = file("${path.root}/aws")
+      }
   }
 
   provisioner "file" {
      content = "${aws_instance.private.private_dns}"
      destination = "/home/ubuntu/private.txt"
+
+     connection {
+        type = "ssh"
+        user = "ubuntu"
+        host = self.public_dns
+        private_key = file("${path.root}/aws")
+      }
+
   }
 
 }
