@@ -31,9 +31,12 @@ After provisioning the resources, SSH into the bastion machine:
 $ ssh -i aws ubuntu@<public_dns>
 ```
 
-Now, SSH to the private instance:
+Now, SSH to the private instance.
+The Terraform code will copy the private key and the private DNS of the private instance
+to the bastion machine:
+
 ```
-$ ssh -i aws ec2-user@<private_dns>
+$ ssh -i aws ec2-user@$(cat private.txt)
 ```
 
 Now we want to test if we can interact with Amazon RDS. Run:
