@@ -18,6 +18,11 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+resource "aws_iam_service_linked_role" "os" {
+    aws_service_name = "es.amazonaws.com"
+    description      = "Allows Amazon OS to manage AWS resources for a domain on your behalf."
+}
+
 
 resource "aws_opensearch_domain" "this" {
   domain_name    = "non-public-domain"
@@ -62,5 +67,7 @@ POLICY
   tags = {
     Domain = "TestDomain"
   }
+
+  depends_on = [aws_iam_service_linked_role.os]
 }
 
