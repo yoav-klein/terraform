@@ -1,5 +1,5 @@
-export AWS_ACCESS_KEY_ID=AKIA5NBJYKEZ2BH3WBPA
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAWDHW6YSBJRP3PQTE
+export AWS_SECRET_ACCESS_KEY=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
 export AWS_REGION=us-east-1
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -26,4 +26,25 @@ function cd_and_remove_terraform() {
         fi
     fi
   done
+}
+
+function new_configuration() {
+    name=$1
+    if [ -z "$name" ]; then echo "Enter name"; return; fi
+
+    mkdir $name; cd $name
+
+    cat << EOF > main.tf
+terraform {
+    required_providers {
+        aws = {
+            source = "hashicorp/aws"
+            version = "~> 4.50"
+        }
+    }
+}
+
+provider "aws" {}
+EOF
+
 }
