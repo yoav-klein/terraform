@@ -1,7 +1,7 @@
 # With Access Control
 ---
 
-This configuration creates a pulbicly-accessible OpenSearch domain
+This configuration creates a publicly-accessible OpenSearch domain
 with resource-based access policy.
 
 The policy allows the user that created the domain (which is the user you use to run
@@ -12,10 +12,10 @@ to run this configration) full access to the domain.
 
 1. Run the configuration:
 ```
-$ tf apply -auto-approve
+$ terraform apply -auto-approve
 ```
 
 2. Test the connection:
 ```
-$ curl -u elastic:Yoav-Klein3 <endpoint>
+$ curl -u elastic:Yoav-Klein3 https://<endpoint>
 ```
