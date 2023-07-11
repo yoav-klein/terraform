@@ -22,11 +22,6 @@ module "vpc" {
   }]
 }
 
-# EIP for the NAT Gateway
-resource "aws_eip" "this" {
-    vpc = true
-}
-
 resource "aws_nat_gateway" "this" {
   allocation_id     = aws_eip.this.allocation_id
   connectivity_type = "public"
