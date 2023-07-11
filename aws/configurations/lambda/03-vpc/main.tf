@@ -72,7 +72,7 @@ resource "aws_lambda_function" "test_lambda" {
 
   environment {
     variables = {
-      foo = "bar"
+      NGINX = aws_instance.nginx.private_dns
     }
   }
 

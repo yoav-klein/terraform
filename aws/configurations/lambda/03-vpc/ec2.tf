@@ -42,7 +42,7 @@ resource "aws_key_pair" "this" {
   public_key = file("aws.pub")
 }
 
-resource "aws_instance" "this" {
+resource "aws_instance" "nginx" {
   ami                  = "ami-053b0d53c279acc90" # Ubuntu 22.04
   key_name             = aws_key_pair.this.key_name
   instance_type        = "t2.small"
@@ -64,5 +64,5 @@ EOF
 
 output "server_domain" {
     description = "Nginx domain name"
-    value = aws_instance.this.public_dns
+    value = aws_instance.nginx.public_dns
 }
