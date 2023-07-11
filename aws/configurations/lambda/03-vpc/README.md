@@ -12,3 +12,19 @@ We'll configure our Lambda function to make an HTTP request to our application, 
 NOTES:
 1. We need to attach another policy to the execution role, so that the function can create 
 ENIs in our VPC.
+
+## Usage
+---
+
+First, create the deployment package:
+```
+$ cd deployment_package
+$ ./create_package.sh
+```
+
+Then, apply the terraform configuration:
+```
+$ terraform apply -auto-approve
+```
+
+Now, go to the console and run a Test. You should get `hello from nginx`.
