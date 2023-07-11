@@ -12,7 +12,7 @@ provider "aws" {}
 
 resource "aws_kms_key" "this" {
   description              = "SigningDocker"
-  key_usage = "SIGN_VERIFY"
+  key_usage = "ENCRYPT_DECRYPT"
   customer_master_key_spec = "RSA_2048"
   deletion_window_in_days  = 10
 }
