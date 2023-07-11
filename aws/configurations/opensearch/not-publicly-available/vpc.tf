@@ -22,16 +22,3 @@ module "vpc" {
   }]
 }
 
-resource "aws_nat_gateway" "this" {
-  allocation_id     = aws_eip.this.allocation_id
-  connectivity_type = "public"
-  subnet_id         = module.vpc.public_subnet_ids[0]
-}
-
-resource "aws_route" "route_to_nat_gateway" {
-    route_table_id = module.vpc.default_route_table_id
-    destination_cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.this.id
-}
-
-
