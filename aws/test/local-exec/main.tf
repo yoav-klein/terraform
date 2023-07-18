@@ -11,9 +11,8 @@ terraform {
 
 resource "null_resource" "update_server" {
     triggers = {
-        server   = aws_instance.this.id # when the server changes
         file = filesha1("fileset/one")
-        dir  = sha1(join("", [for f in fileset("${path.root}", "fileset/changes/*"): filesha1(f)]))
+        dir  = sha1(join("", [for f in fileset("${path.root}", "fileset/changes/**"): filesha1(f)]))
     }
 
     provisioner "local-exec" {
