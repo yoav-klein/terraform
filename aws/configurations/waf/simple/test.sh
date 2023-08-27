@@ -6,8 +6,7 @@ setup() {
 }
 
 test() {
-    shopt -s expand_aliases
     
-    cloudfront_url=$(tf output -raw cloudfront_url)
+    cloudfront_url=$(terraform output -raw cloudfront_url)
     curl ${cloudfront_url}/index.html
 }
