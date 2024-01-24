@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 resource "aws_eks_cluster" "this" {
     name = "eks-opensearch"
     role_arn = aws_iam_role.cluster_role.arn
-    version = "1.24"
+    version = "1.25"
     
     vpc_config {
         subnet_ids = module.vpc.private_subnet_ids
