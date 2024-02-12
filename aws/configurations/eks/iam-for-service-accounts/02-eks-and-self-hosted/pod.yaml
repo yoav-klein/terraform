@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: developer
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::418027335599:role/developer
+    eks.amazonaws.com/role-arn: arn:aws:iam::364268925943:role/developer
 ---
 kind: Pod
 apiVersion: v1

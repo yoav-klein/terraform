@@ -1,5 +1,11 @@
 
 
+resource "random_string" "random" {
+  length  = 8
+  special = false
+  upper = false
+}
+
 ####################################################
 #
 #   OIDC S3 Bucket
@@ -7,7 +13,7 @@
 ####################################################
 
 resource "aws_s3_bucket" "oidc" {
-  bucket = "my-yoav-oidc-bucket"
+  bucket = "oidc-bucket-${random_string.random.result}"
 
   tags = {
     Name        = "OIDC"
@@ -16,7 +22,7 @@ resource "aws_s3_bucket" "oidc" {
 }
 
 
-resource "aws_s3_bucket_public_access_block" "example" {
+resource "aws_s3_bucket_public_access_block" "oidc" {
   bucket = aws_s3_bucket.oidc.id
 
   block_public_acls       = false
@@ -40,6 +46,7 @@ resource "aws_s3_bucket_policy" "public_access_policy" {
       }
     ]
   })
+  depends_on = [aws_s3_bucket_public_access_block.oidc]
 }
 
 data "aws_region" "current" {}
@@ -75,7 +82,7 @@ output "s3_oidc_bucket_name" {
 #################################################
 
 resource "aws_s3_bucket" "content" {
-  bucket = "my-tf-test-bucket-yoav12"
+  bucket = "content-bucket-${random_string.random.result}"
 
   tags = {
     Name        = "My bucket"
@@ -110,3 +117,10 @@ resource "aws_iam_role_policy_attachment" "read_s3" {
   policy_arn = aws_iam_policy.read_s3.arn
   role       = aws_iam_role.developer.name
 }
+
+resource "aws_s3_object" "content" {
+    bucket = aws_s3_bucket.content.id
+    key = "content.txt"
+    content = "IAM for Service Account Demo !"
+}
+
