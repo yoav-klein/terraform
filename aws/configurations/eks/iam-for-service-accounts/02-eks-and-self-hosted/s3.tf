@@ -70,7 +70,7 @@ resource "aws_s3_object" "keys" {
     source = "${path.root}/files/keys.json"
 }
 
-output "s3_oidc_bucket_name" {
+output "s3_oidc_bucket_domain_name" {
     value = aws_s3_bucket.oidc.bucket_domain_name
 }
 

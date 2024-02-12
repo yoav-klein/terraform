@@ -28,11 +28,11 @@ resource "aws_iam_openid_connect_provider" "eks" {
 
 # get the certificates for the provider in order to get the fingerprint
 data "tls_certificate" "microk8s" {
-  url = "https://s3.${data.aws_region.current.name}.amazonaws.com"
+  url = "https://${aws_s3_bucket.oidc.bucket_domain_name}"
 }
 
 resource "aws_iam_openid_connect_provider" "microk8s" {
-  url = "${data.tls_certificate.microk8s.url}/${aws_s3_bucket.oidc.id}"
+  url = "https://${aws_s3_bucket.oidc.bucket_domain_name}"
   thumbprint_list = data.tls_certificate.microk8s.certificates[*].sha1_fingerprint
   client_id_list = ["sts.amazonaws.com"]
 }
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "assume_role_document" {
 
     condition {
       test     = "StringEquals"
-      variable = "s3.us-east-1.amazonaws.com/my-yoav-oidc-bucket:sub"
+      variable = "${replace(aws_iam_openid_connect_provider.microk8s.url, "https://", "")}:sub"
       values   = ["system:serviceaccount:default:developer"]
     }
 
