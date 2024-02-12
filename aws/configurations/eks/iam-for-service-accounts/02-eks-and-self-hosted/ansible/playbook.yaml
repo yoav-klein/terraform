@@ -74,6 +74,10 @@
         path: /var/snap/microk8s/current/args/kube-apiserver
         regexp: "(--service-account-issuer=).*"
         replace: "\\1'https://{{ oidc_host }}'"
+    
+    - name: Restart Microk8s
+      ansible.builtin.shell: microk8s stop; microk8s start
+
 
     - name: Copy test pod YAML to server
       ansible.builtin.copy:
