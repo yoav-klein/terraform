@@ -64,7 +64,7 @@ resource "aws_s3_object" "keys" {
 }
 
 output "s3_oidc_bucket_name" {
-    value = aws_s3_bucket.oidc
+    value = aws_s3_bucket.oidc.bucket_domain_name
 }
 
 

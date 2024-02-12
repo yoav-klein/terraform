@@ -72,5 +72,5 @@
     - name: Replace text in kube-apiserver args
       ansible.builtin.replace:
         path: /var/snap/microk8s/current/args/kube-apiserver
-        regexp: "(--service-account-issuer=)'.*'"
-        replace: "\\1'https://{{ oidc_host }}"
+        regexp: "(--service-account-issuer=).*"
+        replace: "\\1'https://{{ oidc_host }}'"
