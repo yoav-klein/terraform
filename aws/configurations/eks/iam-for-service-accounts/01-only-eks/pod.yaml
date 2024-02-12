@@ -1,0 +1,19 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: developer
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::186651920167:role/developer
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: aws
+spec:
+  serviceAccount: developer
+  containers:
+  - name: aws
+    image: amazon/aws-cli
+    command: ["sleep", "3600"]
+
+

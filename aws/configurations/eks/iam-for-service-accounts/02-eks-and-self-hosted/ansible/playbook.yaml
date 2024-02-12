@@ -1,0 +1,76 @@
+---
+- hosts: aws_ec2
+  remote_user: ubuntu
+  tasks:
+    - name: Install microk8s
+      become: yes
+      snap:
+        name: microk8s
+        classic: yes
+        channel: 1.29
+
+    - name: Add current user to microk8s group
+      become: yes
+      user:
+        name: "{{ ansible_user }}"
+        groups: microk8s
+        append: yes
+
+    - name: Change ownership of ~/.kube directory
+      become: yes
+      file:
+        path: "/home/{{ ansible_user }}/.kube"
+        owner: "{{ ansible_user }}"
+        recurse: yes
+
+    - name: Alias microk8s.kubectl to kubectl
+      become: yes
+      command: snap alias microk8s.kubectl kubectl
+
+    - name: Install cert-manager
+      command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
+
+    - name: Install make
+      become: yes
+      apt:
+        name: make
+        state: present
+
+    - name: Clone amazon-eks-pod-identity-webhook repository
+      git:
+        repo: https://github.com/aws/amazon-eks-pod-identity-webhook.git
+        dest: "/home/{{ ansible_user}}/amazon-eks-pod-identity-webhook"
+        force: yes
+
+    - name: Build and start pod-identity-webhook
+      command: make cluster-up IMAGE=amazon/amazon-eks-pod-identity-webhook:latest
+      args:
+        chdir: "/home/{{ ansible_user }}/amazon-eks-pod-identity-webhook"
+
+    - name: Copy certificate and key to server
+      ansible.builtin.copy:
+        src: ../keys/oidc-issuer.key
+        dest: /var/snap/microk8s/current/certs
+
+    - name: Copy certificate and key to server
+      ansible.builtin.copy:
+        src: ../keys/oidc-issuer.pub
+        dest: /var/snap/microk8s/current/certs
+
+    - name: Replace text in kube-apiserver args
+      ansible.builtin.replace:
+        path: /var/snap/microk8s/current/args/kube-apiserver
+        regexp: '(--service-account-key-file=\${SNAP_DATA}/certs/)serviceaccount.key'
+        replace: '\1oidc-issuer.pub'
+
+    - name: Replace text in kube-apiserver args
+      ansible.builtin.replace:
+        path: /var/snap/microk8s/current/args/kube-apiserver
+        regexp: '(--service-account-signing-key-file=\${SNAP_DATA}/certs/)serviceaccount.key'
+        replace: '\1oidc-issuer.key'
+    
+    - name: Replace text in kube-apiserver args
+      ansible.builtin.replace:
+        path: /var/snap/microk8s/current/args/kube-apiserver
+        regexp: "(--service-account-issuer=)'.*'"
+        replace: "\\1'https://{{ oidc_host }}"
