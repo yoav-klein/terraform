@@ -79,7 +79,7 @@ The Ansible code in the `ansible` directory will:
 3. `terraform apply -auto-approve` to run Terraform.
 4. In order to run Ansible, we need the domain name of the OIDC S3 bucket. Run: 
 ```
-ISSER_HOST=$(terraform output -raw s3_oidc_bucket_domain_name)
+ISSUER_HOST=$(terraform output -raw s3_oidc_bucket_domain_name)
 cd ansible;
 ansible-playbook -i aws_ec2.yaml --key ../private.key -e issuer_host=$ISSUER_HOST playbook.yaml
 ```
