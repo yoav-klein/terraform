@@ -75,7 +75,7 @@ The Ansible code in the `ansible` directory will:
 ## Usage
 ---
 1. Put the AWS credentials in the `enviroment` file and source it.
-2. Run `gen_keys.sh` to create the keys.
+2. Run `gen_keys.sh` to create the keys, as well as the `keys.json` file.
 3. `terraform apply -auto-approve` to run Terraform.
 4. In order to run Ansible, we need the domain name of the OIDC S3 bucket. Run: 
 ```
