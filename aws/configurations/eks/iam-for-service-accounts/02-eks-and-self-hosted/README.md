@@ -81,7 +81,7 @@ The Ansible code in the `ansible` directory will:
 ```
 ISSER_HOST=$(terraform output -raw s3_oidc_bucket_domain_name)
 cd ansible;
-ansible-playbook -i aws_ec2 --key ../private.key -e issuer_host=$ISSUER_HOST
+ansible-playbook -i aws_ec2.yaml --key ../private.key -e issuer_host=$ISSUER_HOST playbook.yaml
 ```
 
 5. Log in to the machine: `ssh -i private.key ubuntu@$(terraform output -raw ec2)`

@@ -81,7 +81,7 @@
       ansible.builtin.replace:
         path: /var/snap/microk8s/current/args/kube-apiserver
         regexp: "(--service-account-issuer=).*"
-        replace: "\\1'https://{{ oidc_host }}'"
+        replace: "\\1'https://{{ issuer_host }}'"
     
     - name: Restart Microk8s
       ansible.builtin.shell: microk8s stop; microk8s start
