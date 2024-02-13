@@ -27,6 +27,10 @@
       become: yes
       command: snap alias microk8s.kubectl kubectl
 
+    - name: Reset ssh connection to allow user changes to affect ansible user
+      ansible.builtin.meta:
+        reset_connection
+
     - name: Install cert-manager
       command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
 
@@ -35,6 +39,10 @@
       apt:
         name: make
         state: present
+    
+    - name: Pause for 5 minutes to build app cache
+      ansible.builtin.pause:
+        seconds: 30
 
     - name: Clone amazon-eks-pod-identity-webhook repository
       git:
