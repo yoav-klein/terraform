@@ -40,9 +40,9 @@
         name: make
         state: present
     
-    - name: Pause for 5 minutes to build app cache
+    - name: Pause for a minute for cert-manager to be ready
       ansible.builtin.pause:
-        seconds: 30
+        seconds: 60
 
     - name: Clone amazon-eks-pod-identity-webhook repository
       git:
