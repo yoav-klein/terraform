@@ -54,7 +54,7 @@ data "aws_region" "current" {}
 data "template_file" "discovery" {
     template = file("${path.root}/templates/discovery.json")
     vars = {
-        ISSUER_HOSTPATH = "s3.${data.aws_region.current.name}.amazonaws.com/${aws_s3_bucket.oidc.id}"
+        ISSUER_HOSTPATH = aws_s3_bucket.oidc.bucket_domain_name
     }
 }
 
