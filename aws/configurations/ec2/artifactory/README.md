@@ -21,4 +21,11 @@ Apply the terraform code:
 $ terraform apply -auto-approve
 ```
 
-The Artifactory server listens on ports 8081 and 8082
+SSH into the machine and run the `run.sh` script.
+Wait for a few minutes for Artifactory to run.
+
+Then you can browse to it using the URL:
+```
+http://<domain-name>:8081
+```
+
