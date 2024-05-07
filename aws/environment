@@ -1,8 +1,21 @@
-export AWS_ACCESS_KEY_ID=AKIAWDHW6YSBJRP3PQTE
-export AWS_SECRET_ACCESS_KEY=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
+#!/bin/bash
+
 export AWS_REGION=us-east-1
 
+read -p "update? " update
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+if [ $update = "Y" ]  || [ $update = "y" ]; then
+    read -p "access key id " AWS_ACCESS_KEY_ID
+    read -p "secret access key " AWS_SECRET_ACCESS_KEY
+
+    echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > creds
+    echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $SCRIPT_DIR/creds
+fi
+
+. $SCRIPT_DIR/creds
+
 alias tf="$SCRIPT_DIR/run_tf.sh"
 
 function clean() {
