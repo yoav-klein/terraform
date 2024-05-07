@@ -1,6 +1,6 @@
 
 resource "aws_lb" "this" {
-  name               = "my-lb"
+  name               = "my-lb-1"
   internal           = false
   load_balancer_type = "application"
   subnets            = module.vpc.public_subnet_ids

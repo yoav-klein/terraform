@@ -1,6 +1,8 @@
 # Website
 ---
 
+![diagram](./img/website.jpg)
+
 
 This configuration creates a set of resources that form a basic skeleton of a website.
 

@@ -7,7 +7,7 @@ data "aws_route53_zone" "public" {
 
 resource "aws_route53_record" "my_website" {
   zone_id = data.aws_route53_zone.public.zone_id
-  name    = "www1.yoav-klein.com"
+  name    = "www2.yoav-klein.com"
   type    = "A"
   
   alias {
