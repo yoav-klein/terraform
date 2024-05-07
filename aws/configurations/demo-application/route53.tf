@@ -1,15 +1,13 @@
 
-resource "aws_route53_zone" "public_zone" {
-  name = "yoav-klein.com"
-  tags = {
-    Environment = "Production"
-  }
+data "aws_route53_zone" "public" {
+    name = "yoav-klein.com"
+    private_zone = false
 }
 
 
 resource "aws_route53_record" "my_website" {
-  zone_id = aws_route53_zone.public_zone.zone_id
-  name    = "www.yoav-klein.com"
+  zone_id = data.aws_route53_zone.public.zone_id
+  name    = "www1.yoav-klein.com"
   type    = "A"
   
   alias {
@@ -20,7 +18,7 @@ resource "aws_route53_record" "my_website" {
 
 }
 
-output "nameservers" {
-    description = "Name servers"
-    value = aws_route53_zone.public_zone.name_servers
+output "website_url" {
+    value = aws_route53_record.my_website.fqdn
 }
+
