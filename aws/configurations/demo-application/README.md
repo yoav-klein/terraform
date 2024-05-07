@@ -49,3 +49,7 @@ Run
 ```
 curl https://$(terraform output -raw website_url)
 ```
+
+## NOTE
+For some reason, Terraform deletes the security group rule of the servers that enables ingress on port 5000.
+Each time you run terraform it either deletes or recreates it.
