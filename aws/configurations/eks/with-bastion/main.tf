@@ -133,6 +133,11 @@ resource "aws_iam_role" "node_role" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
+    policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    role = aws_iam_role.node_role.name
+}
+
 resource "aws_iam_role_policy_attachment" "worker_node_policy" {
     policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
     role = aws_iam_role.node_role.name
