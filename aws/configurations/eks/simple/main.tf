@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 
 
 locals {
-    kubernetes_version = "1.24"
+    kubernetes_version = "1.27"
 }
 
 
