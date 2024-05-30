@@ -31,7 +31,7 @@ module "vpc" {
 
 
 resource "aws_security_group" "this" {
-  name = "nginx-server"
+  name = "BasicSG"
   vpc_id = module.vpc.vpc_id
 
   ingress {
@@ -73,24 +73,24 @@ resource "tls_private_key" "this" {
 
 resource "local_file" "private_key" {
     content = tls_private_key.this.private_key_pem
-    filename = "${path.root}/priv.key"
-    file_permissions = "0600"
+    filename = "${path.root}/private.key"
+    file_permission = "0600"
 }
 
 resource "aws_key_pair" "this" {
-  key_name   = "nginx-keypair"
+  key_name   = "my-keys"
   public_key = tls_private_key.this.public_key_openssh
 }
 
 resource "aws_instance" "this" {
   ami                  = local.amis["ubuntu"]
   key_name             = aws_key_pair.this.key_name
-  instance_type        = "t2.small"
+  instance_type        = "t2.medium"
   vpc_security_group_ids = [ aws_security_group.this.id ]
   subnet_id = module.vpc.public_subnet_ids[0]
   
   tags = {
-    Name = "Nginx"
+    Name = "SimpleServer"
   }
 
 }
