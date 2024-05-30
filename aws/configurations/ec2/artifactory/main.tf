@@ -53,14 +53,25 @@ resource "aws_security_group" "this" {
   }
 }
 
-resource "aws_key_pair" "this" {
-  key_name   = "artifactory-keypair"
-  public_key = file("aws.pub")
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
 }
+
+resource "local_sensitive_file" "private_key" {
+  content  = tls_private_key.private_key.private_key_pem
+  filename = "${path.module}/private.key"
+}
+
+resource "aws_key_pair" "key_pair" {
+  key_name   = "jump-server-keypair1"
+  public_key = tls_private_key.private_key.public_key_openssh
+
+}
+
 
 resource "aws_instance" "this" {
   ami                  = "ami-053b0d53c279acc90" # 'Ubuntu 22.04'
-  key_name             = aws_key_pair.this.key_name
+  key_name             = aws_key_pair.key_pair.key_name
   instance_type        = "t2.small"
   vpc_security_group_ids = [ aws_security_group.this.id ]
   subnet_id = module.vpc.public_subnet_ids[0]
