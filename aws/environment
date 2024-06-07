@@ -7,10 +7,10 @@ read -p "update? " update
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 if [ $update = "Y" ]  || [ $update = "y" ]; then
-    rm $SCRIPT_DIR/creds
     read -p "access key id " AWS_ACCESS_KEY_ID
     read -p "secret access key " AWS_SECRET_ACCESS_KEY
 
+    rm $SCRIPT_DIR/creds
     echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > creds
     echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $SCRIPT_DIR/creds
 fi
