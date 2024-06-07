@@ -1,96 +1,62 @@
-# AWS Load Balancer Controller
+# Webapp on EKS
 ---
 
-In this configuration we install the AWS Load Balancer Controller in the EKS cluster.
+In this configuration we have a basis for a web application hosted on EKS.
 
-The AWS Load Balancer Controller is a controller deployed in the EKS cluster which enables it
-to create Network Load Balancer and Application Load Balancers in AWS.
+## What's included
+---
+The configration creates a:
 
-Network Load Balancers are created for `Service` objects of type `LoadBalancer`
-Application Load Balancers are created for `Ingress` objects.
+* EKS cluster (with the node group, IAM infra and all..)
+    * With AWS Load Balancer Controller which takes Ingress objects and makes a Application Load Balancer from them
+* A Certificate from Let's Encrypt
+* Route53 records to point `yoav-klein.com` to the application
+* Kubernetes objects:
+    * Ingress (which creates the Application Load Balancer)
+    * Deployments and Services (`names` and `numbers`)
 
-## Resources created
+## Prerequisites
+We have a domain `yoav-klein.com` at GoDaddy. But we need to change the nameservers to Route 53:
 
-The regular resources are:
+1. Go to the `route53` directory, create a public Hosted Zone. This will output a list of nameservers.
+2. Go to GoDaddy and change the nameservers to these nameservers of Route 53.
 
-* EKS cluster
-* EKS managed node group
-* IAM OIDC provider for the EKS cluster
-* Required IAM infrastructure
-
-The additional resources for the AWS Load Balancer Controller are:
-* IAM Policy for the AWS Load Balancer Controller
-* IAM Role for this policy
-
-This Role will be assumed by the AWS Load Balancer Controller pods using a ServiceAccount.
-
-The kubernetes manifests that we apply:
-* cert-manager
-* AWS Load Balancer Controller
-* IngressClass
-
-We get those YAMLs using the `get_manifests.sh` script.
-
-## Using the kubectl Provider
-
-In this configuration, we use the `kubectl` Terraform provider. This provider provides the
-`kubectl_manifest` resource, and the `kubectl_file_documents` data resource.
-
-Take a look at the `providers.tf` file to see how we configure this provider so it can access the cluster that we create.
+Only now we can run certbot to issue a certificate for our site.
 
 
 ## Usage
 ---
 
-### Run Terraform
-First, generate the required YAML manifests using the `get_manifests.sh` script:
-```
-$ ./get_manifests.sh
-```
-Run the terraform code: `tf apply -auto-approve`
+1. Run the `get_manifests.sh` script to get the AWS Load Balancer Controller manifests to be installed
+2. Run the `certificate.sh` script. This will: 
+a. Create a private key and a CSR
+b. Use certbot to issue a certificate and a certificate chain.
+3. Create a certificate chain file by chaining all the `chain_0000.pem`, `chain_0001.pem`, etc. files: `cat 0000_chain.pem .. > chain.pem`
+4. Run `terraform apply`
 
-### Configure kubeconfig
+## Test
+---
+
+Run
 ```
-$ ../configure_kubeconfig.sh
+$ curl https://www2.yoav-klein.com/name
 ```
-
-
-## Network Load Balancer
-
-Apply the manifest in the `demo-nlb` directory:
-
+or
 ```
-$ kubectl apply -f demo-nlb/
+$ curl https://wwww2.yoav-klein.com/number
 ```
 
-This will create a Nginx Deployment and Service. Notice that the Service is annotated so that the AWS Load Balancer Controller
-will pick it up.
-
-Wait a few mins so that the Load Balancer will be Active, and then curl it:
+If you try accessing port 80, you'll be redirected to 443:
 ```
-$ curl $(kubectl get svc nginx-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+$ curl http:/www2.yoav-klein.com/number
+301 Moved
 ```
 
-## Application Load Balancer
-In order to create an Application Load Balancer, apply the manifest in the `demo-alb` directory:
-```
-$ kubectl apply -f demo-alb/
-```
+## Explanation
+---
 
-In this example, we create 2 services in our cluster: `number-generator` and `name-generator`. Our Ingress
-will route traffic base on the HTTP path to each of the services.
+Due to the AWS Load Balancer Controller (LBC), the Ingress object will create an Application Load Balancer
+We use the tags that are created on this ALB by the LBC to get the domain name of this ALB.
+We then use this in the Route53 A record to point `www2.yoav-klein.com` to the ALB.
 
-### Some notes
-* We use the `target-type: instance` in the `Ingress` resource. This will that 2 target groups with target type `Instance` will be created,
-  which will route traffic to the nodes in the cluster. Each target group will contain all the nodes in the cluster, but
-  will route to different ports - one for each NodePort of the 2 Services. When you use the `target-type: instance`, the backend
-  services must be of type `NodePort`. 
-  We could also use `target-type: ip`. In this case, the target groups would be of target type `IP`, and each target group would contain
-  the list of IPs of the pods of the Services, so that traffic would be load balanced between the pods directly, without going through the Service in between.
-
-
-## Technical Notes
-* We create the `cert-manager` namespace before applying the full YAML of cert-manager. It seems that if you don't do this,
-  sometimes there's a race condition and it applies the resources out-of-order.
-
-
+Additionally, we use an annotation to attach the ALB to our Certificate.
