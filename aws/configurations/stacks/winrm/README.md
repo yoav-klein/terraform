@@ -14,5 +14,6 @@ $ terraform apply -auto-approve
 ```
 
 Then, run the `get-password.sh` script to get the passwords of the two machines.
-Then, take the Domain name and you can connect to them using Remote Desktop Connection.
 
+Then, using `terraform output` get the public domain name of the machine you want to connect to,
+and connect using Remote Desktop Connection.  DON'T forget to login as `Administator` user
