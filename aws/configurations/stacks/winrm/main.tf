@@ -92,7 +92,20 @@ resource "aws_instance" "windows_server" {
 }
 
 # Output the instance's public IP
-#output "instance_public_ip" {
-#  value = aws_instance.windows_server[*].public_ip
-#}
+output "client_public_dns" {
+  value = aws_instance.windows_server["client"].public_dns
+}
 
+output "server_public_dns" {
+  value = aws_instance.windows_server["server"].public_dns
+}
+
+
+# Output the instance's public IP
+output "client_instance_id" {
+  value = aws_instance.windows_server["client"].id
+}
+
+output "server_instance_id" {
+  value = aws_instance.windows_server["server"].id
+}
