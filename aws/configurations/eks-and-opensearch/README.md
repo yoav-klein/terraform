@@ -10,5 +10,6 @@ The following resources are created:
 * Security groups
 * EKS cluster
 * Opensearch domain
+* Windows EC2 to connect to Kibana
 
 
