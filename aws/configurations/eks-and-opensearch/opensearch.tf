@@ -64,4 +64,7 @@ description = "Domain endpoint"
 value = aws_opensearch_domain.this.endpoint
 } 
 
-
+output "dashboard_endpoint" {
+    description = "OpenSearch Dashboard endpoint"
+    value = aws_opensearch_domain.this.dashboard_endpoint
+}

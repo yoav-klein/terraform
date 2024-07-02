@@ -50,3 +50,11 @@ resource "aws_instance" "jump_server" {
     Name = "Jump Server"
   }
 }
+
+output "windows_public_domain" {
+    value = aws_instance.jump_server.public_dns
+}
+
+output "windows_instance_id" {
+    value = aws_instance.jump_server.id
+}
