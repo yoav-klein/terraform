@@ -9,11 +9,33 @@ data:
       @include "#{ENV['FLUENTD_PROMETHEUS_CONF'] || 'prometheus'}.conf"
       @include kubernetes.conf
       @include conf.d/*.conf
+      <filter kubernetes.**>
+        @type record_modifier
+        <record>
+        labels ${if record["kubernetes"]&.has_key?("labels"); record["kubernetes"]["labels"].inject({}) { |h, (k, v)| h[k.to_s.gsub(".", "_")] = v; h}; end; }
+        
+        </record>
+       </filter>
+      <filter kubernetes.**>
+        @type record_transformer
+        remove_keys $.kubernetes.labels
+      </filter>
+      <filter kubernetes.**>
+        @type record_modifier
+        remove_keys _dummy_
+        <record>
+          _dummy_ ${if record["kubernetes"]&.has_key?('labels'); record['kubernetes']['labels'] = record['labels']; end; nil}
+        </record>
+      </filter>
+      <filter kubernetes.**>
+        @type record_transformer
+        remove_keys labels
+      </filter>
 
       <match **>
         @type opensearch
         @id out_os
-        @log_level info
+        @log_level debug
         include_tag_key true
         host "#{ENV['FLUENT_OPENSEARCH_HOST']}"
         port "#{ENV['FLUENT_OPENSEARCH_PORT']}"
@@ -28,14 +50,17 @@ data:
         logstash_prefix "#{ENV['FLUENT_OPENSEARCH_LOGSTASH_PREFIX'] || 'logstash'}"
         logstash_prefix_separator "#{ENV['FLUENT_OPENSEARCH_LOGSTASH_PREFIX_SEPARATOR'] || '-'}"
         <buffer>
+          @type file
+          path /tmp/fluentd/buffer
           flush_thread_count "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_THREAD_COUNT'] || '1'}"
           flush_mode "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_MODE'] || 'interval'}"
-          flush_interval "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_INTERVAL'] || '60s'}"
+          flush_interval "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_INTERVAL'] || '30s'}"
           chunk_limit_size "#{ENV['FLUENT_OPENSEARCH_BUFFER_CHUNK_LIMIT_SIZE'] || '8M'}"
           total_limit_size "#{ENV['FLUENT_OPENSEARCH_BUFFER_TOTAL_LIMIT_SIZE'] || '512M'}"
           retry_max_interval "#{ENV['FLUENT_OPENSEARCH_BUFFER_RETRY_MAX_INTERVAL'] || '30'}"
           retry_timeout "#{ENV['FLUENT_OPENSEARCH_BUFFER_RETRY_TIMEOUT'] || '72h'}"
           retry_forever "#{ENV['FLUENT_OPENSEARCH_BUFFER_RETRY_FOREVER'] || 'false'}"
         </buffer>
+
       </match>
 

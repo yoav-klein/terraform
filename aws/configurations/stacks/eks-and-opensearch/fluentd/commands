@@ -1,0 +1,30 @@
+
+start_load() {
+    kubectl apply -f load.yaml
+}
+
+stop_load() {
+    kubectl -n default delete pod load
+}
+
+get_fluentd_pod() {
+    node_name=$(kubectl get po -n default load -ojsonpath='{.spec.nodeName}')
+    pod_name=$(kubectl get pods -l k8s-app=fluentd-logging -o jsonpath="{.items[?(@.spec.nodeName==\"$node_name\")].metadata.name}")
+    echo $pod_name
+}
+
+restart() {
+    kubectl apply -f fluentd-cm.yaml
+    kubectl apply -f fluentd-ds.yaml
+    kubectl rollout restart ds fluentd
+}
+
+exec_to_fluentd() {
+    pod_name=$(get_fluentd_pod)
+    kubectl exec -it $pod_name -- bash
+}
+
+fluentd_logs() {
+    pod_name=$(get_fluentd_pod)
+    kubectl logs $pod_name
+}

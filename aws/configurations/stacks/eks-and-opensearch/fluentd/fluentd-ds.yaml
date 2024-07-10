@@ -77,7 +77,7 @@ spec:
               fieldRef:
                 fieldPath: spec.nodeName
           - name: FLUENT_OPENSEARCH_HOST
-            value: "vpc-eks-opensearch-domain-76h7rcxhnca2r7asys6h2i6bda.us-east-1.es.amazonaws.com"
+            value: "vpc-eks-opensearch-domain-4dduw52kxui5cqnrvdoqmqxv6e.us-east-1.es.amazonaws.com"
           - name: FLUENT_OPENSEARCH_PORT
             value: "443"
           - name: FLUENT_OPENSEARCH_INDEX_NAME
@@ -96,12 +96,16 @@ spec:
             value: admin
           - name: FLUENT_OPENSEARCH_PASSWORD
             value: admin
+          - name: FLUENT_OPENSEARCH_BUFFER_CHUNK_LIMIT_SIZE
+            value: '6M'
+          - name: FLUENT_OPENSEARCH_BUFFER_FLUSH_THREAD_COUNT
+            value: '4'
         resources:
           limits:
-            memory: 200Mi
+            memory: 512Mi
           requests:
             cpu: 100m
-            memory: 200Mi
+            memory: 100Mi
         volumeMounts:
         - name: varlog
           mountPath: /var/log

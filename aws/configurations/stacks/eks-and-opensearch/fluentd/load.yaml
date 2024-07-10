@@ -1,0 +1,10 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  namespace: default
+  name: load
+spec:
+  containers:
+    - name: load
+      image: ubuntu:22.04
+      command: ["bash", "-c", "while true; do base64 -w 99 /dev/urandom | head -5000; sleep 1; done"]
