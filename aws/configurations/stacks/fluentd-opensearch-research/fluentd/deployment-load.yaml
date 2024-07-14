@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load
+  namespace: default
+  labels:
+    app: load
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: load
+  template:
+    metadata:
+      labels:
+        app: load
+    spec:
+      containers:
+      - name: load
+        image: ubuntu:22.04
+        command: ["bash", "-c", "while true; do base64 -w 99 /dev/urandom | head -4000; sleep 1; done"]

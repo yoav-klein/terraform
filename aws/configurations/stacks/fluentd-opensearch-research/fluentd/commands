@@ -1,0 +1,51 @@
+
+
+start_load() {
+    kubectl apply -f load.yaml
+}
+
+stop_load() {
+    kubectl -n default delete pod load
+}
+
+get_fluentd_pod() {
+    node_name=$(kubectl get po -n default load -ojsonpath='{.spec.nodeName}')
+    pod_name=$(kubectl get pods -n kube-system -l k8s-app=fluentd-logging -o jsonpath="{.items[?(@.spec.nodeName==\"$node_name\")].metadata.name}")
+    echo $pod_name
+}
+
+
+restart() {
+    kubectl apply -f fluentd-cm.yaml
+    kubectl apply -f fluentd-ds.yaml
+    kubectl -n kube-system rollout restart ds fluentd
+}
+
+exec_to_fluentd() {
+    pod_name=$(get_fluentd_pod)
+    kubectl -n kube-system exec -it $pod_name -- bash
+}
+
+fluentd_logs() {
+    pod_name=$(get_fluentd_pod)
+    kubectl -n kube-system logs $pod_name
+}
+
+monitor_buffer() {
+    fluentd_pods=($(kubectl get po -l k8s-app=fluentd-logging -o jsonpath='{.items[*].metadata.name}'))
+    while true; do
+        for pod in "${fluentd_pods[@]}"; do
+            buffer_size=$(kubectl exec $pod -- bash -c "du -h /fluentd/buffer")
+            echo "$(date) $pod $buffer_size" >> buffer-size.txt
+        done
+        sleep 5
+    done
+}
+
+clean_buffers() {
+
+    fluentd_pods=($(kubectl get po -l k8s-app=fluentd-logging -o jsonpath='{.items[*].metadata.name}'))
+    for pod in "${fluentd_pods[@]}"; do
+        kubectl exec $pod -- bash -c "rm /fluentd/buffer/*"
+    done
+}
