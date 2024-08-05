@@ -9,6 +9,15 @@ data:
       @include "#{ENV['FLUENTD_PROMETHEUS_CONF'] || 'prometheus'}.conf"
       @include kubernetes.conf
       @include conf.d/*.conf
+    
+      <filter kubernetes.**>
+        @type grep
+        <regexp>
+          key $.kubernetes.namespace_name
+          pattern /default/
+        </regexp>
+      </filter>
+
       <filter kubernetes.**>
         @type record_modifier
         <record>
@@ -49,12 +58,13 @@ data:
         logstash_format "#{ENV['FLUENT_OPENSEARCH_LOGSTASH_FORMAT'] || 'false'}"
         logstash_prefix "#{ENV['FLUENT_OPENSEARCH_LOGSTASH_PREFIX'] || 'logstash'}"
         logstash_prefix_separator "#{ENV['FLUENT_OPENSEARCH_LOGSTASH_PREFIX_SEPARATOR'] || '-'}"
+        request_timeout '30s'
         <buffer>
           @type file
-          path /tmp/fluentd/buffer
+          path /fluentd/buffer
           flush_thread_count "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_THREAD_COUNT'] || '1'}"
           flush_mode "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_MODE'] || 'interval'}"
-          flush_interval "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_INTERVAL'] || '30s'}"
+          flush_interval "#{ENV['FLUENT_OPENSEARCH_BUFFER_FLUSH_INTERVAL'] || '60s'}"
           chunk_limit_size "#{ENV['FLUENT_OPENSEARCH_BUFFER_CHUNK_LIMIT_SIZE'] || '8M'}"
           total_limit_size "#{ENV['FLUENT_OPENSEARCH_BUFFER_TOTAL_LIMIT_SIZE'] || '512M'}"
           retry_max_interval "#{ENV['FLUENT_OPENSEARCH_BUFFER_RETRY_MAX_INTERVAL'] || '30'}"
