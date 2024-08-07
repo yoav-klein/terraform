@@ -2,7 +2,7 @@
 
 module "vpc3" {
     source = "../../../modules/vpc"
-    name = "vpc1"
+    name = "vpc3"
     cidr = "10.2.0.0/16"
     public_subnets = [{ 
         az = "us-east-1b"
