@@ -82,6 +82,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "peering" {
   }
 }
 
+
 resource "aws_ec2_transit_gateway_route" "one" {
   destination_cidr_block         = "10.1.0.0/16"
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.peering.id
