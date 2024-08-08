@@ -82,14 +82,23 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "peering" {
   }
 }
 
+resource "time_sleep"  "wait_for_accepter" {
+    depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peering]
+
+    create_duration = "30s"
+}
 
 resource "aws_ec2_transit_gateway_route" "one" {
+  depends_on = [time_sleep.wait_for_accepter]
+
   destination_cidr_block         = "10.1.0.0/16"
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.peering.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.vpc1.association_default_route_table_id
 }
 
 resource "aws_ec2_transit_gateway_route" "two" {
+  depends_on = [time_sleep.wait_for_accepter]
+
   destination_cidr_block         = "10.0.0.0/16"
   transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_peering_attachment.peering.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.vpc2.association_default_route_table_id
