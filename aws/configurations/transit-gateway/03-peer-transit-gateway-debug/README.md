@@ -1,37 +1,42 @@
-# Transit Gateway
+# Transit Gateway Peering
 ---
 
-A Transit Gateway allows you to connect two or more VPCs and allow communication between them.
+You can peer two or more transit gateways to allow flow of traffic between them.
 
-In this example, we demonstrate how to connect 2 EC2 instances in separate VPCs using a Transit Gateway.
+In this example we create:
+* 2 VPCs - each with a EC2 instance in the public subnet
+    * In each - a route to the transit gateway
+* 2 Transit Gateways, in each
+    * A single route table
+    * A VPC Attachment for the VPC that associates and propagates to the deafult route table
+* A peering attachment that peers the 2 transit gateways
+* A static route in each transit gateway to the peering attachment.
 
-So we create 2 VPCs, with a EC2 instance in each of them. We create a transit gateway to connect them.
 
 ## Usage
 ---
 
-Run terraform:
+Run the terraform code:
 ```
 $ terraform apply -auto-approve
 ```
 
-Copy the `private2.key` to the `vpc1` EC2:
+Distribute the keys:
 ```
-$ scp -i private1.key ubuntu@$(terraform output -raw vpc1_ec2_public_domain):~
-```
-
-Note the private (!) domain name of `vpc2`:
-```
-$ terraform output -raw vpc2_ec2_private_domain
+$ ./distribute_keys.sh
 ```
 
-SSH into `vpc1` EC2:
+SSH to VPC1 machine:
 ```
-$ ssh -i private1.key ubuntu@$(terraform output -raw vpc1_ec2_public_domain)
+$ ssh -i private1.key ubuntu@<ip-of-vpc-1>
 ```
 
-and in this machine, SSH to `vpc2` EC2:
+From there, SSH to VPC2 machine:
+```
+$ ssh -i private2.key ubuntu@<private-ip-of-vpc-2>
+```
 
-```
-$ ssh -i private2.key ubuntu@<vpc2-private-domain>
-```
+## BUG
+---
+For some reason, the routes in the VPC route tables that point to the transit gateway are
+constantly deleted and recreated on each terraform run
