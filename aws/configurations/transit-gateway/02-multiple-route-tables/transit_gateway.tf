@@ -127,22 +127,36 @@ resource "aws_ec2_transit_gateway_route_table_association" "vpc4" {
 #
 ####################################
 
-resource "aws_ec2_transit_gateway_route_table_propagation" "vpc1" {
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpc1_rt1" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc1.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpc1_vpc2.id
 }
 
-resource "aws_ec2_transit_gateway_route_table_propagation" "vpc2" {
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpc2_rt1" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc2.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpc1_vpc2.id
 }
 
-resource "aws_ec2_transit_gateway_route_table_propagation" "vpc3" {
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpc3_rt2" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc3.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpc3_vpc4.id
 }
 
-resource "aws_ec2_transit_gateway_route_table_propagation" "vpc4" {
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpc4_rt2" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc4.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpc3_vpc4.id
 }
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpc1_rt2" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc1.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpc3_vpc4.id
+}
+
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpc3_rt1" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc3.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpc1_vpc2.id
+}
+
+
+
