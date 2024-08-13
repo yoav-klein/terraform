@@ -50,13 +50,17 @@ resource "aws_route_table" "public" {
   count = length(var.public_subnets) > 0 ? 1 : 0
   
   vpc_id = aws_vpc.this.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.this[0].id
-  }
   tags = {
     Name = "${var.name}-public-rt"
   }
+}
+
+resource "aws_route" "to_internet_gateway" {   
+  count = length(var.public_subnets) > 0 ? 1 : 0
+
+  route_table_id            = aws_route_table.public[0].id
+  destination_cidr_block    = "0.0.0.0/0"
+  gateway_id                = aws_internet_gateway.this[0].id
 }
 
 
@@ -117,14 +121,19 @@ resource "aws_route_table" "private" {
   count = length(var.public_subnets) > 0 ? 1 : 0
   
   vpc_id = aws_vpc.this.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.this[0].id
-  }
   tags = {
     Name = "${var.name}-private-rt"
   }
 }
+
+resource "aws_route" "to_nat_gateway" {   
+  count = length(var.public_subnets) > 0 ? 1 : 0
+
+  route_table_id            = aws_route_table.private[0].id
+  destination_cidr_block    = "0.0.0.0/0"
+  gateway_id                = aws_nat_gateway.this[0].id
+}
+
 
 
 resource "aws_subnet" "private_subnets" {

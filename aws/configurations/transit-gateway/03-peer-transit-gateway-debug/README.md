@@ -36,7 +36,3 @@ From there, SSH to VPC2 machine:
 $ ssh -i private2.key ubuntu@<private-ip-of-vpc-2>
 ```
 
-## BUG
----
-For some reason, the routes in the VPC route tables that point to the transit gateway are
-constantly deleted and recreated on each terraform run
