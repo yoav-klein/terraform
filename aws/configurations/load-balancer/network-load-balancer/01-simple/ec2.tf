@@ -47,7 +47,7 @@ resource "aws_security_group" "servers" {
 }
 
 module "ec2_servers" {
-    source = "../../../modules/ec2"
+    source = "../../../../modules/ec2"
 
     name = "nginx-server"    
     ami = local.amis["ubuntu"]
@@ -66,7 +66,7 @@ EOF
 }
 
 module "ec2_bastion" {
-    source = "../../../modules/ec2"
+    source = "../../../../modules/ec2"
     name = "bastion"    
     ami = local.amis["ubuntu"]
     pub_key_path="${path.module}/aws.pub"

@@ -5,7 +5,7 @@
 
 # VPC with 2 private subnets, and 2 public subnets
 module "vpc" {
-  source   = "../../../modules/vpc"
+  source   = "../../../../modules/vpc"
   name = "my-vpc"
   cidr     = "10.0.0.0/16"
   private_subnets = [{
