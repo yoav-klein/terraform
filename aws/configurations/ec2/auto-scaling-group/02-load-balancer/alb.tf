@@ -21,10 +21,29 @@ resource "aws_security_group_rule" "server_from_lb" {
   security_group_id        = aws_security_group.servers.id
 }
 
+resource "aws_security_group_rule" "health_check_server_from_lb" {
+  type              = "ingress"
+  from_port         = 8090
+  to_port           = 8090
+  protocol          = "tcp"
+  source_security_group_id = aws_security_group.load_balancer.id
+  security_group_id        = aws_security_group.servers.id
+}
+
+
 resource "aws_security_group_rule" "lb_to_server" {
   type              = "egress"
   from_port         = 5000
   to_port           = 5000
+  protocol          = "tcp"
+  source_security_group_id = aws_security_group.servers.id
+  security_group_id        = aws_security_group.load_balancer.id
+}
+
+resource "aws_security_group_rule" "health_check_lb_to_server" {
+  type              = "egress"
+  from_port         = 8090
+  to_port           = 8090
   protocol          = "tcp"
   source_security_group_id = aws_security_group.servers.id
   security_group_id        = aws_security_group.load_balancer.id
@@ -62,9 +81,11 @@ resource "aws_lb_target_group" "this" {
   vpc_id   = module.vpc.vpc_id
   target_type = "instance"
 
-  # health_check {
-
-  #}
+  health_check {
+    port = 8090
+    protocol = "HTTP"
+    path = "/health"
+  }
 }
 
 output "alb-domain-name" {
