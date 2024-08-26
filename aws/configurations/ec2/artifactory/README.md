@@ -29,3 +29,4 @@ Then you can browse to it using the URL:
 http://<domain-name>:8081
 ```
 
+The initial credentials are `admin:password`

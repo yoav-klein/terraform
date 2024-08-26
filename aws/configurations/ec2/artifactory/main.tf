@@ -72,7 +72,7 @@ resource "aws_key_pair" "key_pair" {
 resource "aws_instance" "this" {
   ami                  = "ami-053b0d53c279acc90" # 'Ubuntu 22.04'
   key_name             = aws_key_pair.key_pair.key_name
-  instance_type        = "t2.small"
+  instance_type        = "t3.medium"
   vpc_security_group_ids = [ aws_security_group.this.id ]
   subnet_id = module.vpc.public_subnet_ids[0]
   user_data = <<EOF
