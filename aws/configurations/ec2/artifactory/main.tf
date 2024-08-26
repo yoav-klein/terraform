@@ -86,7 +86,7 @@ touch ./system.yaml
 chown -R 1030:1030 $JFROG_HOME/artifactory/var
 chmod 777 $JFROG_HOME/artifactory/var
 
-echo "docker run --name artifactory -v $JFROG_HOME/artifactory/var/:/var/opt/jfrog/artifactory -d -p 8081:8081 -p 8082:8082 releases-docker.jfrog.io/jfrog/artifactory-oss:latest" > /home/ubuntu/run.sh
+echo "docker run --name artifactory -v $JFROG_HOME/artifactory/var/:/var/opt/jfrog/artifactory -d -p 8081:8081 -p 8082:8082 releases-docker.jfrog.io/jfrog/artifactory-oss:7.59.23" > /home/ubuntu/run.sh
 chown ubuntu:ubuntu /home/ubuntu/run.sh
 chmod +x /home/ubuntu/run.sh
 
