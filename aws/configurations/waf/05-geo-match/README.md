@@ -1,32 +1,24 @@
-# WAF
+# Geo Match
 ---
 
-In this configuration, we demonstrate a simple web ACL configuration
-which filters traffic based on IP address.
 
+In this configuration, we create a Geo Match rule, which blocks access from Ireland and Israel.
 
-This configuration creates the following resources:
-* S3 bucket
-* CloudFront distribution which serves this bucket
-* WAF web ACL
-  * IP set
-
-So we create a CloudFront disribution which serves the S3 bucket,
-so we can access the bucket's contents using the distribution, and
-we associate the web ACL with the CloudFront distribution.
-
-The web ACL has one rule, which blocks traffic from the IP of this machine.
 
 ## Usage
-After creating the resources with `tf apply`, run:
+After creating the resources with `terrform apply`, run:
+
 
 ```
 $ . test.sh
 $ setup
-$ test
 ```
 
-And you will see that you can't access the resource.
+Now try accessing from your browser (assuming you're in Israel) - and you see you're blocked.
 
-On the other hand, take the URL of the CloudFront distribution and try to access it
-from another machine
+If this machine is in ireland, running:
+```
+test
+```
+
+will also be blocked

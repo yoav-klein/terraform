@@ -70,7 +70,7 @@ resource "aws_cloudfront_distribution" "this" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
- # web_acl_id = aws_wafv2_web_acl.this.arn
+  web_acl_id = aws_wafv2_web_acl.this.arn
 }
 
 output "bucket_name" {
