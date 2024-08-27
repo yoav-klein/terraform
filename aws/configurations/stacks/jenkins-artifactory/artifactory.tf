@@ -28,7 +28,12 @@ EOF
 
 }
 
-output "artifactory_domain" {
-    description = "Artifactory domain name"
+output "artifactory_public_domain" {
+    description = "Artifactory public domain name"
     value = aws_instance.artifactory.public_dns
+}
+
+output "artifactory_private_domain" {
+    description = "Artifactory private domain"
+    value = aws_instance.artifactory.private_dns
 }

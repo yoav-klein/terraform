@@ -1,7 +1,28 @@
 # Jenkins + Artficatory
+---
+
+First, run terraform apply.
+
+## Artifactory
+
+SSH to the Artifactory machine and run the `./run.sh` script
+
+Log to Artifactory GUI `http://<artifactory-machine-domain>:8081`
+
+Default credentials: `admin:password`
 
 
-Configure a Artifactory server in Jenkins with the ID 'artifactory'
+## Jenkins
+
+Log in to Jenkins: `http://<jenkins-machine-domain>:8080`
+
+
+Run this to get the initial passsord:
+```
+ssh -i private.key ubuntu@$(terraform output -raw jenkins_public_domain) 'docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword'
+```
+
+Configure a Artifactory server in Jenkins with the ID 'artifactory' using the `artifactory_private_domain` output
 
 
 Start with a simple Pipeline:

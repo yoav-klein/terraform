@@ -25,7 +25,8 @@ EOF
 
 }
 
-output "jenkins_domain" {
+output "jenkins_public_domain" {
     description = "Jenkins domain"
     value = aws_instance.jenkins.public_dns
 }
+
