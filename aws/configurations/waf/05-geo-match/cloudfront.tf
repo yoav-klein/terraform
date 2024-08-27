@@ -10,6 +10,9 @@ terraform {
 
 provider "aws" {}
 
+
+#### S3 Bucket
+
 resource "aws_s3_bucket" "this" {
   bucket = "mytestbucket-yoav13"
 }
@@ -23,21 +26,25 @@ resource "aws_s3_bucket_public_access_block" "this" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
-  bucket = aws_s3_bucket.this.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
+resource "aws_s3_bucket_policy" "public_bucket_policy" {
   depends_on = [aws_s3_bucket_public_access_block.this]
+  bucket = aws_s3_bucket.this.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = "*"
+        Action = "s3:GetObject"
+        Resource = "${aws_s3_bucket.this.arn}/*"
+      }
+    ]
+  })
 }
 
-resource "aws_s3_bucket_acl" "this" {
-  bucket = aws_s3_bucket.this.id
-  acl    = "public-read"
 
-  depends_on = [aws_s3_bucket_public_access_block.this]
-}
-
+#### CloudFront
 
 resource "aws_cloudfront_distribution" "this" {
   enabled = true
