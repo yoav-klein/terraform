@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-consumer
+spec:
+  containers:
+  - name: memory-consumer
+    image: yoavklein3/stress:0.2
+    env:
+      - name: "SIZE"
+        value: "512"
+    resources:
+      limits:
+        memory: "1Gi"  # Set memory limit for the pod
+
