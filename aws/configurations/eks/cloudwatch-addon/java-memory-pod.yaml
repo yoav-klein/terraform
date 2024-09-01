@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: java-memory
+spec:
+  containers:
+  - name: java-memory
+    image: yoavklein3/java-stress:0.1
+    env:
+      - name: "SIZE"
+        value: "500"
+      - name: "JAVA_TOOL_OPTIONS"
+        value: "-XX:MaxRAMPercentage=80"
+    resources:
+      limits:
+        memory: "1Gi"  # Set memory limit for the pod
+
