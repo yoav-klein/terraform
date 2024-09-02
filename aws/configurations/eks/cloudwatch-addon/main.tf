@@ -1,15 +1,3 @@
-
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.50"
-    }
-  }
-}
-
-provider "aws" { }
-
 ##########################################################
 # Create a VPC for the cluster
 
@@ -109,19 +97,34 @@ resource "aws_eks_cluster" "this" {
 
     depends_on = [
         aws_iam_role_policy_attachment.cluster_policy_attachment
-    ]
-    
+    ]    
 }
 
 
 
-############# Add-on #####################
+#################### Add-on ################################
 
 
 resource "aws_eks_addon" "example" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "amazon-cloudwatch-observability"
   service_account_role_arn = aws_iam_role.cloudwatch_agent.arn
+}
+
+
+######### CloudWatch agent with Prometheus Support ##########
+
+data "http" "cwprometheus" {
+    url = "https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/service/cwagent-prometheus/prometheus-eks.yaml"
+}
+
+data "kubectl_file_documents" "cwprometheus" {
+    content = data.http.cwprometheus.response_body
+}
+
+resource "kubectl_manifest" "cwprometheus" {
+    count     = length(data.kubectl_file_documents.cwprometheus.documents)
+    yaml_body = element(data.kubectl_file_documents.cwprometheus.documents, count.index)
 }
 
 

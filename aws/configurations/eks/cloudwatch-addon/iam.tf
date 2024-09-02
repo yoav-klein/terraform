@@ -38,7 +38,9 @@ data "aws_iam_policy_document" "assume_role_document" {
     condition {
       test     = "StringEquals"
       variable = "${replace(aws_iam_openid_connect_provider.this.url, "https://", "")}:sub"
-      values   = ["system:serviceaccount:amazon-cloudwatch:cloudwatch-agent"]
+      values   = ["system:serviceaccount:amazon-cloudwatch:cloudwatch-agent", 
+                  "system:serviceaccount:amazon-cloudwatch:cwagent-prometheus"
+                 ]
     }
 
     condition {
@@ -66,3 +68,16 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
     policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+resource "kubectl_manifest" "cwagent_prometheus_sa" {
+    yaml_body = <<YAML
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cwagent-prometheus
+  namespace: amazon-cloudwatch
+  annotations:
+     eks.amazonaws.com/role-arn: ${aws_iam_role.cloudwatch_agent.arn}
+   
+YAML
+
+}

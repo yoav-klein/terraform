@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: java-prom-exp
+spec:
+  containers:
+  - name: java-prom-exp
+    image: yoavklein3/java-prom-exp:0.1
+    ports:
+      - containerPort: 9404
+        name: exporter
+    resources:
+      limits:
+        memory: "1Gi"  # Set memory limit for the pod
+
