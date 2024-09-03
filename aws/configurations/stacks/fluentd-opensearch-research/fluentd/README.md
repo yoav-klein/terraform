@@ -7,4 +7,4 @@ publish logs to OpenSearch. It's suitable for running in the EKS + AWS OpenSearc
 It's designed to work with an OpenSearch domain that has no access control, so the user password
 is null.
 
-All you need to change is the host key in the `fluentd-ds.yaml` file
+All you need to change is the host key of OpenSearch domain in the `fluentd-ds.yaml` file
