@@ -11,6 +11,9 @@ spec:
   containers:
   - name: java-prom-exp
     image: yoavklein3/java-prom-exp:0.1
+    env:
+      - name: SIZE
+        value: '200'
     ports:
       - containerPort: 9404
         name: exporter
