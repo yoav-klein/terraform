@@ -114,15 +114,13 @@ resource "aws_eks_addon" "example" {
 
 ######### CloudWatch agent with Prometheus Support ##########
 
-data "http" "cwprometheus" {
-    url = "https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/service/cwagent-prometheus/prometheus-eks.yaml"
-}
-
 data "kubectl_file_documents" "cwprometheus" {
-    content = data.http.cwprometheus.response_body
+    content = file("${path.root}/kubernetes-yamls/cwagent-prometheus.yaml")
 }
 
 resource "kubectl_manifest" "cwprometheus" {
+    depends_on = [ kubectl_manifest.cwagent_prometheus_sa ]
+    
     count     = length(data.kubectl_file_documents.cwprometheus.documents)
     yaml_body = element(data.kubectl_file_documents.cwprometheus.documents, count.index)
 }

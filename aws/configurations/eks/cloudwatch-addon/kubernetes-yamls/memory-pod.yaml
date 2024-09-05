@@ -8,7 +8,9 @@ spec:
     image: yoavklein3/stress:0.2
     env:
       - name: "SIZE"
-        value: "512"
+        value: "1300"
+      - name: "PERCENT"
+        value: "80"
     resources:
       limits:
         memory: "1Gi"  # Set memory limit for the pod

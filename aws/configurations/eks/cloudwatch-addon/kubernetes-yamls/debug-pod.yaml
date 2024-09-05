@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-pod
+  labels:
+    app: aws-cli
+spec:
+  serviceAccountName: cwagent-prometheus
+  containers:
+  - name: aws-cli
+    image: amazon/aws-cli:latest
+    command: ["sh", "-c", "while true; do sleep 3600; done"]
+
