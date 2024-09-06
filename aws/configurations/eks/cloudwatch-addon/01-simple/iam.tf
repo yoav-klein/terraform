@@ -68,27 +68,3 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
     policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-resource "kubectl_manifest" "cloudwatch-namespace" {
-    yaml_body = <<YAML
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: amazon-cloudwatch
-   
-YAML
-
-}
-
-resource "kubectl_manifest" "cwagent_prometheus_sa" {
-    yaml_body = <<YAML
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cwagent-prometheus
-  namespace: amazon-cloudwatch
-  annotations:
-     eks.amazonaws.com/role-arn: ${aws_iam_role.cloudwatch_agent.arn}
-   
-YAML
-
-}

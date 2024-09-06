@@ -8,7 +8,7 @@ spec:
     image: yoavklein3/stress:0.2
     env:
       - name: "SIZE"
-        value: "1300"
+        value: "1000"
       - name: "PERCENT"
         value: "80"
     resources:

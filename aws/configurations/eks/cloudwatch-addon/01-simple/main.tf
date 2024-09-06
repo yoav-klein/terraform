@@ -6,7 +6,7 @@
 ##########################################################
 
 module "vpc" {
-  source   = "../../../modules/vpc"
+  source   = "../../../../modules/vpc"
   name = "k8s-vpc"
   cidr     = "10.0.0.0/16"
   private_subnets = [{
@@ -111,19 +111,6 @@ resource "aws_eks_addon" "example" {
   service_account_role_arn = aws_iam_role.cloudwatch_agent.arn
 }
 
-
-######### CloudWatch agent with Prometheus Support ##########
-
-data "kubectl_file_documents" "cwprometheus" {
-    content = file("${path.root}/kubernetes-yamls/cwagent-prometheus.yaml")
-}
-
-resource "kubectl_manifest" "cwprometheus" {
-    depends_on = [ kubectl_manifest.cwagent_prometheus_sa ]
-    
-    count     = length(data.kubectl_file_documents.cwprometheus.documents)
-    yaml_body = element(data.kubectl_file_documents.cwprometheus.documents, count.index)
-}
 
 
 #############################################################
