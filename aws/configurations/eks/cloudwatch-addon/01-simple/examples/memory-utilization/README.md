@@ -13,3 +13,10 @@ The memory-related metrics are:
 * `pod_memory_limit`  - The sum of the memory limit set on all the containers
 * `pod_memory_working_set` - the docs say that it's not reported directly as a metric, but I can see it in the list of metrics..
 
+
+Here's a Log Insights Query that visualizes the `pod_memory_working_set`, `pod_memory_rss` and `pod_memory_limit`:
+```
+fields pod_memory_rss, pod_memory_working_set, pod_memory_limit |
+filter Type = "Pod" | filter PodName = "memory-consumer" |
+stats max(pod_memory_working_set), max(pod_memory_rss), max(pod_memory_limit) by bin(1min)
+```
