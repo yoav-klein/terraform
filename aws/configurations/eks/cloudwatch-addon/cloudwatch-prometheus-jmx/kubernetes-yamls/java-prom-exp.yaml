@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: java-prom-exp
+  namespace: default
+spec:
+  volumes:
+    - name: config
+      configMap:
+        name: jmx-config
+  containers:
+  - name: java-prom-exp
+    image: yoavklein3/java-prom-exp:0.1
+    env:
+      - name: SIZE
+        value: '200'
+    ports:
+      - containerPort: 9404
+        name: exporter
+    resources:
+      limits:
+        memory: "2Gi"  # Set memory limit for the pod
+    volumeMounts:
+      - name: config
+        mountPath: /app/config.yaml
+        subPath: config
+
