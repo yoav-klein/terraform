@@ -145,6 +145,8 @@ resource "datadog_api_key" "eks" {
 }
 
 resource "kubernetes_namespace" "datadog" {
+  depends_on = [ aws_eks_cluster.this ]
+
   metadata {
     name = "datadog"
   }
@@ -173,6 +175,3 @@ resource "helm_release" "datadog" {
   chart      = "datadog-operator"
 }
 
-resource "kubernetes_manifest" "operator" {
-    manifest = yamldecode(file("${path.root}/templates/datadog-operator.yaml"))
-}

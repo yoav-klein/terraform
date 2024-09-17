@@ -1,20 +1,19 @@
-# Elastic Kubernetes Service
+# Datadog + EKS
 ---
 
-This configuration creates the following infrastructure:
-* VPC
-  * 1 public subnet
-  * 2 private subnets
-  * NAT gateway in the public subnet
-* EKS cluster
-* EKS node group for the cluster
+A EKS cluster with Datadog Operator installed.
 
-
-## Notes
+## Usage
 ---
 
-* The EKS cluster has both private and public endpoints enabled
-* The node group provisions nodes in the private subnets
-* The NAT gateway is required for the nodes to be able to access the internet. This is required as per the [docs](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
+Apply terraform code:
 
+```
+$ terraform apply -auto-approve
+```
 
+Deploy the Datadog Operator:
+```
+$ ./configure_kubeconfig.sh
+$ kubectl apply -f templates/datadog-operator.yaml
+```
