@@ -99,22 +99,6 @@ resource "aws_eip" "this" {
     count = length(var.public_subnets) > 0 ? 1 : 0
 }
 
-# only if there are public subnets
-resource "aws_nat_gateway" "this" {
-  count = length(var.public_subnets) > 0 ? 1 : 0
-  
-  connectivity_type = "public"
-  allocation_id = aws_eip.this[0].id
-  subnet_id     = aws_subnet.public_subnets[0].id
-
-  tags = {
-    Name = "${var.name}-nat-gateway"
-  }
-
-  # To ensure proper ordering, it is recommended to add an explicit dependency
-  # on the Internet Gateway for the VPC.
-  depends_on = [aws_internet_gateway.this]
-}
 
 # only if there are public subnets
 resource "aws_route_table" "private" {
@@ -125,15 +109,6 @@ resource "aws_route_table" "private" {
     Name = "${var.name}-private-rt"
   }
 }
-
-resource "aws_route" "to_nat_gateway" {   
-  count = length(var.public_subnets) > 0 ? 1 : 0
-
-  route_table_id            = aws_route_table.private[0].id
-  destination_cidr_block    = "0.0.0.0/0"
-  gateway_id                = aws_nat_gateway.this[0].id
-}
-
 
 
 resource "aws_subnet" "private_subnets" {
