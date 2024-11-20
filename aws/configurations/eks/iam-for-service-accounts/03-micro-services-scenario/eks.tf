@@ -7,7 +7,7 @@
 ##########################################################
 
 module "vpc" {
-  source   = "../../modules/vpc"
+  source   = "../../../../modules/vpc"
   name = "k8s-vpc"
   cidr     = "10.0.0.0/16"
   private_subnets = [{

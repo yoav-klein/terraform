@@ -28,6 +28,14 @@ data "aws_iam_policy_document" "read_s3" {
   }
 }
 
+resource "aws_s3_object" "object" {
+  bucket = aws_s3_bucket.this.id
+  key    = "content.txt"
+  source = "${path.root}/content.txt"
+
+#  etag = filemd5("path/to/file")
+}
+
 resource "aws_iam_policy" "read_s3" {
   name        = "ReadFromS3"
   path        = "/"
