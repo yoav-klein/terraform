@@ -15,9 +15,12 @@ terraform {
 provider "aws" { }
 
 provider "helm" {
-  host                   = data.aws_eks_cluster.this.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.this.token
+  kubernetes = {
+
+    host                   = data.aws_eks_cluster.this.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.this.token
+  }
 }
 
 
@@ -158,6 +161,20 @@ resource "aws_eks_node_group" "this" {
     ]
 
 }
+
+
+######################################
+# Metrics Server
+######################################
+
+resource "helm_release" "metrics_server" {
+  name       = "metrics-server"
+  repository = "https://kubernetes-sigs.github.io/metrics-server"
+  chart      = "metrics-server"
+  namespace  = "kube-system"
+
+}
+
 
 ######################################
 # outputs
