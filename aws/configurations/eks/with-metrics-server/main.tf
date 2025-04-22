@@ -58,7 +58,7 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 
 
 locals {
-    kubernetes_version = "1.27"
+    kubernetes_version = "1.32"
 }
 
 
@@ -143,8 +143,8 @@ resource "aws_eks_node_group" "this" {
     version = local.kubernetes_version
     
     scaling_config {
-        desired_size = 3
-        max_size = 6
+        desired_size = 2
+        max_size = 2
         min_size = 1
     }
 

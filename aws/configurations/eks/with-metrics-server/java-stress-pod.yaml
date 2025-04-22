@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: stress
-    image: yoavklein3/java-stress:0.4
+    image: yoavklein3/java-stress:0.5
     resources:
       limits:
         memory: "1000Mi"
