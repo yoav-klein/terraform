@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.50"
+      version = "~> 5.95"
     }
   }
 }
@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 
 
 locals {
-    kubernetes_version = "1.27"
+    kubernetes_version = "1.32"
 }
 
 
@@ -106,6 +106,9 @@ resource "aws_eks_cluster" "this" {
         endpoint_public_access = true
     }
     
+    access_config {
+        authentication_mode = "API_AND_CONFIG_MAP"
+    }
 
     depends_on = [
         aws_iam_role_policy_attachment.cluster_policy_attachment
@@ -165,8 +168,8 @@ resource "aws_eks_node_group" "this" {
     version = local.kubernetes_version
     
     scaling_config {
-        desired_size = 3
-        max_size = 6
+        desired_size = 1
+        max_size = 1
         min_size = 1
     }
 
