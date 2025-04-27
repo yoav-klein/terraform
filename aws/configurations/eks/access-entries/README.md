@@ -1,20 +1,22 @@
-# Elastic Kubernetes Service
+# Access Entries
 ---
 
-This configuration creates the following infrastructure:
-* VPC
-  * 1 public subnet
-  * 2 private subnets
-  * NAT gateway in the public subnet
-* EKS cluster
-* EKS node group for the cluster
+Builds on the simple example.
 
+This demonstrates the use of Access Entries and Access Policies.
 
-## Notes
+We creatae a `john` user and create an access entry for him, and attach an access policy
+that allows him to view the cluster.
+
+## Usage
 ---
 
-* The EKS cluster has both private and public endpoints enabled
-* The node group provisions nodes in the private subnets
-* The NAT gateway is required for the nodes to be able to access the internet. This is required as per the [docs](https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html)
+Apply terraform.
 
+Then, export the AWS credentials of john:
+```
+$ export AWS_ACCESS_KEY_ID=<outputted access key id>
+$ export AWS_SECRET_ACCESS_KEY=$(cat secret_access_key)
+```
 
+now, run `kubectl get po`. You should get a response which is not `forbidden`
