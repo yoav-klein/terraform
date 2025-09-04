@@ -1,7 +1,4 @@
 
-locals {
-    cluster_name = "my-cluster"
-}
 
 ##########################################################
 # Create a VPC for the cluster
@@ -91,9 +88,6 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 # The cluster
 ########################################################
 
-locals {
-  kubernetes_version = "1.24"
-}
 
 resource "aws_eks_cluster" "this" {
   name     = local.cluster_name
@@ -164,8 +158,8 @@ resource "aws_eks_node_group" "this" {
 
   version = local.kubernetes_version
   scaling_config {
-    desired_size = 2
-    max_size     = 10
+    desired_size = local.node_count
+    max_size     = local.node_count
     min_size     = 1
   }
 

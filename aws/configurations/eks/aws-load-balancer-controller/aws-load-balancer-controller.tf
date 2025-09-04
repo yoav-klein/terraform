@@ -3,7 +3,7 @@
 ##################################################
 
 data "http" "aws_load_balancer_controller_iam_policy_document" {
-  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.7/docs/install/iam_policy.json"
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v${local.aws_load_balancer_controller_version}/docs/install/iam_policy.json"
 }
 
 resource "aws_iam_policy" "aws_load_balancer_controller" {
@@ -95,9 +95,9 @@ resource "kubectl_manifest" "cert_manager" {
 # AWS Load Balancer Controller
 ###############################
 
-data "kubectl_file_documents" "aws_load_balancer_controller" {
-  content = file("manifests/aws-load-balancer-controller.yaml")
-}
+#data "kubectl_file_documents" "aws_load_balancer_controller" {
+#  content = file("manifests/aws-load-balancer-controller.yaml")
+#}
 
 data "kubectl_file_documents" "ingress_class" {
   content = file("manifests/ingclass.yaml")
@@ -121,19 +121,44 @@ YAML
   depends_on = [aws_eks_cluster.this, aws_iam_role.aws_load_balancer_controller]
 }
 
-resource "kubectl_manifest" "aws_load_balancer_controller" {
-  count = length(data.kubectl_file_documents.aws_load_balancer_controller.documents)
-
-  yaml_body = element(data.kubectl_file_documents.aws_load_balancer_controller.documents, count.index)
-
-  depends_on = [kubectl_manifest.cert_manager, kubectl_manifest.service_account_for_alb]
+resource "helm_release" "aws_load_balancer_controller" {
+  name  = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart = "aws-load-balancer-controller"
+  namespace = "kube-system"
+  set = [
+    {
+        name = "vpcId",         # pods can't access instance metadata (for some reason, don't care), so we need to tell it the VPC ID
+        value = module.vpc.vpc_id
+    },
+    {
+        name = "clusterName"
+        value = aws_eks_cluster.this.name
+    },
+    {
+        name = "serviceAccount.create"
+        value = false
+    },
+    {
+        name = "serviceAccount.name"
+        value = "aws-load-balancer-controller" 
+    }
+  ]
 }
 
-resource "kubectl_manifest" "ingress_class" {
-  count = length(data.kubectl_file_documents.ingress_class.documents)
+#resource "kubectl_manifest" "aws_load_balancer_controller" {
+#  count = length(data.kubectl_file_documents.aws_load_balancer_controller.documents)
 
-  yaml_body = element(data.kubectl_file_documents.ingress_class.documents, count.index)
+#  yaml_body = element(data.kubectl_file_documents.aws_load_balancer_controller.documents, count.index)
 
-  depends_on = [kubectl_manifest.aws_load_balancer_controller]
-}
+#  depends_on = [kubectl_manifest.cert_manager, kubectl_manifest.service_account_for_alb]
+#}
+
+#resource "kubectl_manifest" "ingress_class" {
+#  count = length(data.kubectl_file_documents.ingress_class.documents)
+
+#  yaml_body = element(data.kubectl_file_documents.ingress_class.documents, count.index)
+
+#  depends_on = [kubectl_manifest.aws_load_balancer_controller]
+#}
 
