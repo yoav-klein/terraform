@@ -289,3 +289,50 @@ resource "aws_iam_role_policy_attachment" "karpenter_role_policy_attachment" {
   role       = aws_iam_role.karpenter_controller.name
 }
 
+
+###############################################################################
+#   Karpenter Helm chart
+###############################################################################
+
+resource "helm_release" "karpenter" {
+    name = "karpenter"
+    repository = "oci://public.ecr.aws/karpenter"
+    chart = "karpenter"
+    version = local.karpenter_version
+    namespace = "karpenter"
+    create_namespace = true
+    set = [
+        {
+            name  = "settings.clusterName"
+            value = aws_eks_cluster.this.name
+        },
+        {
+            name  = "settings.interruptionQueue"
+            value = aws_eks_cluster.this.name
+        },
+        {
+            name = "controller.resources.requests.cpu"
+            value = "200m"
+        },
+        {
+            name = "controller.resources.requests.memory"
+            value = "512Mi"
+        },
+        {
+            name = "controller.resources.limits.cpu"
+            value = 1
+        },
+        {
+            name = "controller.resources.limits.memory"
+            value = "1Gi"
+        },
+        {
+            name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+            value = aws_iam_role.karpenter_controller.arn
+        },
+
+    ]
+    depends_on = [aws_eks_cluster.this] 
+}
+
+
