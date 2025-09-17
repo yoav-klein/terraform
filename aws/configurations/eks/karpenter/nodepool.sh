@@ -1,12 +1,10 @@
 
 K8S_VERSION="1.33"
 CLUSTER_NAME=$(terraform output -raw cluster_name)
-ROLE_NAME=$(terraform output -raw karpenter_role_name)
+ROLE_NAME=$(terraform output -raw node_role_name)
+CLUSTER_SECURITY_GROUP=$(terraform output -raw cluster_security_group)
 ALIAS_VERSION="$(aws ssm get-parameter --name "/aws/service/eks/optimized-ami/${K8S_VERSION}/amazon-linux-2023/x86_64/standard/recommended/image_id" --query Parameter.Value | xargs aws ec2 describe-images --query 'Images[0].Name' --image-ids | sed -r 's/^.*(v[[:digit:]]+).*$/\1/')"
 
-echo $CLUSTER_NAME
-echo $ROLE_NAME
-echo $ALIAS_VERSION
 
 cat << EOF | envsubst | kubectl apply -f -
 apiVersion: karpenter.sh/v1
@@ -55,6 +53,5 @@ spec:
     - tags:
         karpenter.sh/discovery: "${CLUSTER_NAME}"
   securityGroupSelectorTerms:
-    - tags:
-        karpenter.sh/discovery: "${CLUSTER_NAME}"
+    - id: ${CLUSTER_SECURITY_GROUP}
 EOF

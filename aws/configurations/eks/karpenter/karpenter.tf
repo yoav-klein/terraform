@@ -289,10 +289,3 @@ resource "aws_iam_role_policy_attachment" "karpenter_role_policy_attachment" {
   role       = aws_iam_role.karpenter_controller.name
 }
 
-resource "aws_security_group" "karpenter" {
-    name = "karpenter"
-    description = "Security group for Karpenter-created instances"
-    tags = {
-        "karpenter.sh/discovery" = aws_eks_cluster.this.name
-    }
-}
