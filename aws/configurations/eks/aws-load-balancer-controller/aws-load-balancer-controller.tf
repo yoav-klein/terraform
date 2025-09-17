@@ -88,16 +88,13 @@ resource "kubectl_manifest" "cert_manager" {
 
   yaml_body = element(data.kubectl_file_documents.cert_manager.documents, count.index)
 
-  depends_on = [time_sleep.wait_for_cert_manager_ns]
+  depends_on = [time_sleep.wait_for_cert_manager_ns, aws_eks_node_group.this]
 }
 
 ###############################
 # AWS Load Balancer Controller
 ###############################
 
-#data "kubectl_file_documents" "aws_load_balancer_controller" {
-#  content = file("manifests/aws-load-balancer-controller.yaml")
-#}
 
 data "kubectl_file_documents" "ingress_class" {
   content = file("manifests/ingclass.yaml")
@@ -144,21 +141,6 @@ resource "helm_release" "aws_load_balancer_controller" {
         value = "aws-load-balancer-controller" 
     }
   ]
+
+  depends_on = [kubectl_manifest.cert_manager]
 }
-
-#resource "kubectl_manifest" "aws_load_balancer_controller" {
-#  count = length(data.kubectl_file_documents.aws_load_balancer_controller.documents)
-
-#  yaml_body = element(data.kubectl_file_documents.aws_load_balancer_controller.documents, count.index)
-
-#  depends_on = [kubectl_manifest.cert_manager, kubectl_manifest.service_account_for_alb]
-#}
-
-#resource "kubectl_manifest" "ingress_class" {
-#  count = length(data.kubectl_file_documents.ingress_class.documents)
-
-#  yaml_body = element(data.kubectl_file_documents.ingress_class.documents, count.index)
-
-#  depends_on = [kubectl_manifest.aws_load_balancer_controller]
-#}
-
