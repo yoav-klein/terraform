@@ -1,12 +1,3 @@
-
-K8S_VERSION="1.33"
-CLUSTER_NAME=$(terraform output -raw cluster_name)
-ROLE_NAME=$(terraform output -raw node_role_name)
-CLUSTER_SECURITY_GROUP=$(terraform output -raw cluster_security_group)
-ALIAS_VERSION="$(aws ssm get-parameter --name "/aws/service/eks/optimized-ami/${K8S_VERSION}/amazon-linux-2023/x86_64/standard/recommended/image_id" --query Parameter.Value | xargs aws ec2 describe-images --query 'Images[0].Name' --image-ids | sed -r 's/^.*(v[[:digit:]]+).*$/\1/')"
-
-
-cat << EOF | envsubst | kubectl apply -f -
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
@@ -46,12 +37,13 @@ kind: EC2NodeClass
 metadata:
   name: default
 spec:
-  role: "${ROLE_NAME}"
+  role: "${node_role_name}"
+  amiFamily: AL2023
   amiSelectorTerms:
-    - alias: "al2023@${ALIAS_VERSION}"
+    - id: "${ami_id}"
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: "${CLUSTER_NAME}"
+        karpenter.sh/discovery: "${cluster_name}"
   securityGroupSelectorTerms:
-    - id: ${CLUSTER_SECURITY_GROUP}
-EOF
+    - id: ${cluster_security_group}
+
