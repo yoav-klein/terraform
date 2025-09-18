@@ -112,19 +112,27 @@ data "aws_ssm_parameter" "ami" {
     name = "/aws/service/eks/optimized-ami/${local.kubernetes_version}/amazon-linux-2023/x86_64/standard/recommended/image_id"
 }
 
-data "kubectl_path_documents" "karpenter" {
-    pattern = "${path.root}/templates/karpenter.yaml.tpl"
+# Karpenter resources
+
+data "template_file" "ec2nodeclass" {
+    template = file("${path.root}/templates/ec2nodeclass.yaml.tpl")
     vars = {
        node_role_name = aws_iam_role.node_role.name
        cluster_name = aws_eks_cluster.this.name
        cluster_security_group = aws_eks_cluster.this.vpc_config[0].cluster_security_group_id
        ami_id = data.aws_ssm_parameter.ami.value
     }
+
 }
 
-resource "kubectl_manifest" "karpenter" {
-  count = length(data.kubectl_path_documents.karpenter.documents)
+resource "kubectl_manifest" "ec2nodelcass" {
+    yaml_body = data.template_file.ec2nodeclass.rendered
+    
+    depends_on = [ helm_release.karpenter ]
+}
 
-  yaml_body = element(data.kubectl_path_documents.karpenter.documents, count.index)
-
+resource "kubectl_manifest" "nodepool" {
+    yaml_body = file("${path.root}/templates/nodepool.yaml")
+    
+    depends_on = [ helm_release.karpenter ]
 }
