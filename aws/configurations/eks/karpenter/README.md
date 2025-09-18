@@ -31,3 +31,17 @@ Note that we set the `serviceAccount.annotations` value with an IRSA annotation 
 Finally, we deploy a NodePool and EC2NodeClass, which is essential for Karpenter to work.
 Note that in the EC2NodeClass resource we refer to the security group created by our cluster, so that new instances provisioned 
 by Karpenter will be attached to this security group. This security group has all the necessary rules for communication in the cluster. 
+
+## Test
+---
+
+We have the `deployment.yaml` which is an Nginx deployment. Go ahead and deploy it.
+
+Then, scale up to 7 replicas:
+```
+$ kubectl scale deploy --replicas=7 nginx
+```
+
+You'll see that Karpenter spin up a small node, as it only needs to deploy 1 pod on it (the rest fits on the single node of the cluster).
+You can then scale up to 12 and see how it spins a bigger node, and then consolidates them.
+
