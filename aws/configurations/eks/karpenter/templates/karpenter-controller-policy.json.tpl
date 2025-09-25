@@ -165,6 +165,16 @@
       "Action": "pricing:GetProducts"
     },
     {
+      "Sid": "AllowInterruptionQueueActions",
+      "Effect": "Allow",
+      "Resource": "${karpenter_interruption_queue_arn}",
+      "Action": [
+        "sqs:DeleteMessage",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+      ]
+    },
+    {
       "Sid": "AllowPassingInstanceRole",
       "Effect": "Allow",
       "Resource": "${node_role_arn}",

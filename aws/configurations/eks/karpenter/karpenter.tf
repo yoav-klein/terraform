@@ -19,6 +19,7 @@ data "template_file" "karpenter_controller_policy" {
         cluster_name = aws_eks_cluster.this.name
         region = data.aws_region.current.name
         node_role_arn = aws_iam_role.node_role.arn
+        karpenter_interruption_queue_arn = aws_sqs_queue.interruption_queue.arn
     }
 }
 
@@ -102,6 +103,101 @@ resource "helm_release" "karpenter" {
     ]
     depends_on = [aws_eks_cluster.this] 
 }
+
+###############################################################################
+# Interruption SQS queue
+###############################################################################
+
+resource "aws_sqs_queue" "interruption_queue" {
+  name                       = "KarpenterInterruption"
+  delay_seconds              = 30
+  visibility_timeout_seconds = 60
+  max_message_size           = 2048
+  message_retention_seconds  = 300
+  receive_wait_time_seconds  = 10 # long polling
+
+  policy = <<POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EC2InterruptionPolicy",
+            "Effect": "Allow",
+            "Principal": { "Service": [ "events.amazonaws.com", "sqs.amazonaws.com" ] },
+            "Action": "sqs:SendMessage",
+            "Resource": "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:KarpenterInterruption"
+        }
+    ]
+  }
+POLICY
+}
+
+
+# EventBridge rules
+
+resource "aws_cloudwatch_event_rule" "scheduled_change_rule" {
+  name        = "ScheduledChangeRule"
+  description = "Scheduled change rule"
+
+  event_pattern = jsonencode({
+    detail-type = [ "AWS Health Event" ]
+    source = [ "aws.ec2" ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "scheduled_change_rule" {
+  rule      = aws_cloudwatch_event_rule.scheduled_change_rule.name
+  arn       = aws_sqs_queue.interruption_queue.arn
+}
+
+resource "aws_cloudwatch_event_rule" "spot_interruption_rule" {
+  name        = "SpotInterruptionRule"
+  description = "Spot interruption rule"
+
+  event_pattern = jsonencode({
+    detail-type = [ "EC2 Spot Instance Interruption Warning" ]
+    source = [ "aws.ec2" ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "spot_interruption_rule" {
+  rule      = aws_cloudwatch_event_rule.spot_interruption_rule.name
+  arn       = aws_sqs_queue.interruption_queue.arn
+}
+
+
+resource "aws_cloudwatch_event_rule" "rebalance_rule" {
+  name        = "RebalanceRule"
+  description = "Rebalance rule"
+
+  event_pattern = jsonencode({
+    detail-type = [ "EC2 Instance Rebalance Recommendation" ]
+    source = [ "aws.ec2" ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "rebalance_rule" {
+  rule      = aws_cloudwatch_event_rule.rebalance_rule.name
+  arn       = aws_sqs_queue.interruption_queue.arn
+}
+
+resource "aws_cloudwatch_event_rule" "instance_state_change_rule" {
+  name        = "InstanceStateChangeRule"
+  description = "Instance state change rule"
+
+  event_pattern = jsonencode({
+    detail-type = [ "EC2 Instance State-change Notification" ]
+    source = [ "aws.ec2" ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "instance_state_change_rule" {
+  rule      = aws_cloudwatch_event_rule.instance_state_change_rule.name
+  arn       = aws_sqs_queue.interruption_queue.arn
+}
+
+
+
 
 
 ###############################################################################
