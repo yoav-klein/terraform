@@ -77,7 +77,7 @@ resource "helm_release" "karpenter" {
         },
         {
             name  = "settings.interruptionQueue"
-            value = aws_eks_cluster.this.name
+            value = aws_sqs_queue.interruption_queue.name
         },
         {
             name = "controller.resources.requests.cpu"
