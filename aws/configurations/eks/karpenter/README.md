@@ -20,6 +20,12 @@ we create a role for the controller and a policy.
 
 Note that the role assume policy allows the `karpenter` service account to assume the role.
 
+### Interruption SQS queue
+
+Karpenter uses a SQS queue to get notified about changes in the nodes that Karpenter creates, like spot interruption warnings, state changes, stuff like that.
+So we create a SQS queue and a set of EventBridge rules that forward those events to the queue.
+The Karpenter controller is given permissions to read from this queue.
+
 ### Karpenter installation
 
 We use the Karpenter Helm chart in order to deploy Karpenter.
