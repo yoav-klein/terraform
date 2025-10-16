@@ -90,11 +90,6 @@ resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
 ######################################################
 
 
-locals {
-    kubernetes_version = "1.32"
-}
-
-
 resource "aws_eks_cluster" "this" {
     name = "my-cluster"
     role_arn = aws_iam_role.cluster_role.arn
@@ -115,6 +110,28 @@ resource "aws_eks_cluster" "this" {
     ]
     
 }
+
+
+## Access Policy for cluster creator
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_eks_access_entry" "admin" {
+  cluster_name      = aws_eks_cluster.this.name
+  principal_arn     = data.aws_caller_identity.current.arn
+  type              = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "admin" {
+  cluster_name      = aws_eks_cluster.this.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn     = data.aws_caller_identity.current.arn
+
+  access_scope {
+    type = "cluster"
+  }
+}
+
 
 
 #############################################################
@@ -168,8 +185,8 @@ resource "aws_eks_node_group" "this" {
     version = local.kubernetes_version
     
     scaling_config {
-        desired_size = 1
-        max_size = 1
+        desired_size = 2
+        max_size = 2
         min_size = 1
     }
 
