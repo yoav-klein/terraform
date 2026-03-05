@@ -23,4 +23,8 @@ resource "argocd_repository_credentials" "my_org" {
   url = "https://github.com/deployment-demo/"
   username = "yoav"
   password = "yoavklein3"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
