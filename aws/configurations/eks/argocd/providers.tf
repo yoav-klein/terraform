@@ -12,7 +12,7 @@ terraform {
     
     helm = {
       source = "hashicorp/helm"
-      version = "3.0.2"
+      version = "3.1.1"
     }
 
      kubernetes = {
@@ -52,7 +52,8 @@ provider "helm" {
 
 provider "argocd" {
     username = "admin"
-    server_addr = "aad4c4e34dade4ca481844d08ca9bfc3-1670300221.us-east-1.elb.amazonaws.com:443"
+    #server_addr = "aad4c4e34dade4ca481844d08ca9bfc3-1670300221.us-east-1.elb.amazonaws.com:443"
+    port_forward = true
     password  = base64decode(data.kubernetes_secret_v1.argocd_admin_password.binary_data.password)
     insecure = true
 }
@@ -72,6 +73,7 @@ data "aws_eks_cluster_auth" "this" {
 data "kubernetes_secret_v1" "argocd_admin_password" {
   metadata {
     name      = "argocd-initial-admin-secret"
+    namespace = "argocd"
   }
   binary_data  = {
     "password" = ""
@@ -80,7 +82,7 @@ data "kubernetes_secret_v1" "argocd_admin_password" {
   depends_on = [helm_release.argocd]
 }
 
-output "argocd_admin_password" {
-  value     = base64decode(data.kubernetes_secret_v1.argocd_admin_password.binary_data.password)
-  sensitive = true
-}
+#output "argocd_admin_password" {
+#  value     = base64decode(data.kubernetes_secret_v1.argocd_admin_password.binary_data.password)
+#  sensitive = true
+#}
