@@ -1,0 +1,26 @@
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: check-images
+spec:
+  matchImageReferences: # At least one sub-field is required
+    - glob: 'quay.io/argoproj/*'
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ['']
+        apiVersions: ['v1']
+        operations: ['CREATE']
+        resources: ['pods']
+  attestors:
+    - name: cosign # A unique name to identify this attestor
+      cosign:
+        keyless: # Keyless signing verification (OIDC-based)
+          identities: # List of accepted signing identities
+            - subject: 'yoavklein25@gmail.com'
+              issuer: 'https://github.com/login/oauth'
+            - subjectRegExp: "https://github.com/argoproj/argo-cd/.github/workflows/image-reuse.yaml@refs/tags/v"
+              issuer: "https://token.actions.githubusercontent.com"
+  validations:
+    - expression: >-
+        images.containers.map(image, verifyImageSignatures(image, [attestors.cosign])).all(e, e > 0)
+      messageExpression: "'Failed image signature verification' + object.metadata.labels['app.kubernetes.io/name']"
