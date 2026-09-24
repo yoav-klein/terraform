@@ -20,6 +20,7 @@ resource "aws_instance" "private" {
     instance_type = "t2.small"
     key_name = aws_key_pair.ssh.key_name
     subnet_id = aws_subnet.private.id
+    vpc_security_group_ids  = [aws_security_group.private.id]
 
     tags = {
         Name = "basics-private"
@@ -50,10 +51,38 @@ resource "aws_security_group" "public" {
 resource "aws_vpc_security_group_ingress_rule" "allows_ssh" {
     security_group_id = aws_security_group.public.id
     cidr_ipv4         = "0.0.0.0/0"
-    from_port         = 0
+    from_port         = 22
     ip_protocol       = "tcp"
     to_port           = 22
 }
+
+
+resource "aws_security_group" "private" {
+    vpc_id = aws_vpc.main.id
+    name = "basics-private"
+    tags = {
+        Name = "basics-private"
+    }
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "allows_ssh_from_public" {
+    security_group_id = aws_security_group.private.id
+    referenced_security_group_id = aws_security_group.public.id
+    from_port         = 22
+    ip_protocol       = "tcp"
+    to_port           = 22
+}
+
+
+resource "aws_vpc_security_group_egress_rule" "allows_ssh_to_private" {
+    security_group_id = aws_security_group.public.id
+    referenced_security_group_id = aws_security_group.private.id
+    from_port         = 22
+    ip_protocol       = "tcp"
+    to_port           = 22
+}
+
 
 output "public_ip" {
     value = aws_instance.public.public_ip
