@@ -56,7 +56,7 @@ docker run --network=host yoavklein3/health:0.1
 
 EOF
     
-    depends_on = [aws_vpc_security_group_egress_rule.targets_to_world]
+    depends_on = [aws_vpc_security_group_egress_rule.targets_to_world, module.vpc]
 }
 
 resource "aws_security_group" "targets" {
