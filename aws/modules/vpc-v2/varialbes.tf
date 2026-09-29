@@ -1,4 +1,9 @@
 
+variable "prefix" {
+    type = string
+    default = "my-vpc"
+}
+
 variable "name" {
   type    = string
   default = "my-vpc"
