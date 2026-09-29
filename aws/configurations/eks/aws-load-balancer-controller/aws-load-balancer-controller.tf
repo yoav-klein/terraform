@@ -57,40 +57,6 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_role_pol
 #####################################################
 
 
-##############################
-# cert-manager
-##############################
-
-data "kubectl_file_documents" "cert_manager" {
-  content = file("manifests/cert-manager.yaml")
-}
-
-# need to create the namespace first, since you might have a race condition
-resource "kubectl_manifest" "cert_manager_ns" {
-  yaml_body = <<YAML
-apiVersion: v1
-kind: Namespace
-metadata:
-    name: cert-manager
-YAML
-
-  depends_on = [aws_eks_cluster.this]
-}
-
-resource "time_sleep" "wait_for_cert_manager_ns" {
-  depends_on = [kubectl_manifest.cert_manager_ns]
-
-  create_duration = "60s"
-}
-
-resource "kubectl_manifest" "cert_manager" {
-  count = length(data.kubectl_file_documents.cert_manager.documents)
-
-  yaml_body = element(data.kubectl_file_documents.cert_manager.documents, count.index)
-
-  depends_on = [time_sleep.wait_for_cert_manager_ns, aws_eks_node_group.this]
-}
-
 ###############################
 # AWS Load Balancer Controller
 ###############################
@@ -118,29 +84,28 @@ YAML
   depends_on = [aws_eks_cluster.this, aws_iam_role.aws_load_balancer_controller]
 }
 
-resource "helm_release" "aws_load_balancer_controller" {
-  name  = "aws-load-balancer-controller"
-  repository = "https://aws.github.io/eks-charts"
-  chart = "aws-load-balancer-controller"
-  namespace = "kube-system"
-  set = [
-    {
-        name = "vpcId",         # pods can't access instance metadata (for some reason, don't care), so we need to tell it the VPC ID
-        value = module.vpc.vpc_id
-    },
-    {
-        name = "clusterName"
-        value = aws_eks_cluster.this.name
-    },
-    {
-        name = "serviceAccount.create"
-        value = false
-    },
-    {
-        name = "serviceAccount.name"
-        value = "aws-load-balancer-controller" 
-    }
-  ]
-
-  depends_on = [kubectl_manifest.cert_manager]
-}
+#resource "helm_release" "aws_load_balancer_controller" {
+#  name  = "aws-load-balancer-controller"
+#  repository = "https://aws.github.io/eks-charts"
+#  chart = "aws-load-balancer-controller"
+#  namespace = "kube-system"
+#  set = [
+#    {
+#        name = "vpcId",         # pods can't access instance metadata (for some reason, don't care), so we need to tell it the VPC ID
+#        value = module.vpc.vpc_id
+#    },
+#    {
+#        name = "clusterName"
+#        value = aws_eks_cluster.this.name
+#    },
+#    {
+#        name = "serviceAccount.create"
+#        value = false
+#    },
+#    {
+#        name = "serviceAccount.name"
+#        value = "aws-load-balancer-controller" 
+#    }
+#  ]
+#
+#}
