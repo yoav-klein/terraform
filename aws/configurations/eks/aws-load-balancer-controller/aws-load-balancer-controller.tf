@@ -84,28 +84,27 @@ YAML
   depends_on = [aws_eks_cluster.this, aws_iam_role.aws_load_balancer_controller]
 }
 
-#resource "helm_release" "aws_load_balancer_controller" {
-#  name  = "aws-load-balancer-controller"
-#  repository = "https://aws.github.io/eks-charts"
-#  chart = "aws-load-balancer-controller"
-#  namespace = "kube-system"
-#  set = [
-#    {
-#        name = "vpcId",         # pods can't access instance metadata (for some reason, don't care), so we need to tell it the VPC ID
-#        value = module.vpc.vpc_id
-#    },
-#    {
-#        name = "clusterName"
-#        value = aws_eks_cluster.this.name
-#    },
-#    {
-#        name = "serviceAccount.create"
-#        value = false
-#    },
-#    {
-#        name = "serviceAccount.name"
-#        value = "aws-load-balancer-controller" 
-#    }
-#  ]
-#
-#}
+resource "helm_release" "aws_load_balancer_controller" {
+  name  = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart = "aws-load-balancer-controller"
+  namespace = "kube-system"
+  set = [
+    {
+        name = "vpcId",         # pods can't access instance metadata (for some reason, don't care), so we need to tell it the VPC ID
+        value = module.vpc.vpc_id
+    },
+    {
+        name = "clusterName"
+        value = aws_eks_cluster.this.name
+    },
+    {
+        name = "serviceAccount.create"
+        value = false
+    },
+    {
+        name = "serviceAccount.name"
+        value = "aws-load-balancer-controller" 
+    }
+  ]
+}
