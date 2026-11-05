@@ -1,60 +1,5 @@
 
 
-##########################################################
-# Create a VPC for the cluster
-
-# the VPC contains 2 private subnets for the cluster
-# and a public subnet for load balancers and whatever
-##########################################################
-
-module "vpc" {
-  source = "../vpc"
-  name   = "${var.cluster_name}-eks-vpc"
-  cidr   = "10.0.0.0/16"
-  private_subnets = [{
-    az   = "us-east-1b"
-    cidr = "10.0.1.0/24"
-    },
-    {
-      az   = "us-east-1c"
-      cidr = "10.0.2.0/24"
-  }]
-  public_subnets = [{
-    az   = "us-east-1b",
-    cidr = "10.0.3.0/24"
-    },
-    {
-      az   = "us-east-1c",
-      cidr = "10.0.4.0/24"
-  }]
-  private_subnet_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = 1
-    "karpenter.sh/discovery"                      = local.cluster_name
-  }
-  public_subnet_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                      = 1
-  }
-
-}
-
-resource "aws_eip" "this" {
-  vpc = true
-}
-
-
-resource "aws_nat_gateway" "this" {
-  allocation_id     = aws_eip.this.allocation_id
-  connectivity_type = "public"
-  subnet_id         = module.vpc.public_subnet_ids[0]
-}
-
-resource "aws_route" "route_to_nat_gateway" {
-  route_table_id         = module.vpc.default_route_table_id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_nat_gateway.this.id
-}
 
 
 ########################################################
@@ -62,7 +7,7 @@ resource "aws_route" "route_to_nat_gateway" {
 # to access AWS services
 ########################################################
 
-data "aws_iam_policy_document" "assume_role" {
+data "aws_iam_policy_document" "cluster_role_trust_policy" {
   statement {
     effect = "Allow"
 
@@ -76,8 +21,8 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "cluster_role" {
-  name               = "eks-cluster-example"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  name               = "${var.cluster_name}-ClusterRole"
+  assume_role_policy = data.aws_iam_policy_document.cluster_role_trust_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_policy_attachment" {
@@ -96,9 +41,13 @@ resource "aws_eks_cluster" "this" {
   version  = local.kubernetes_version
 
   vpc_config {
-    subnet_ids              = module.vpc.private_subnet_ids
+    subnet_ids              = var.cluster_subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
+  }
+
+  access_config {
+        authentication_mode = "API_AND_CONFIG_MAP"
   }
 
 
@@ -120,7 +69,7 @@ resource "aws_eks_cluster" "this" {
 #####################################
 
 resource "aws_iam_role" "node_role" {
-  name = "EKSNodeRole"
+  name = "${var.cluster_name}-ClusterNodeRole"
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -164,16 +113,17 @@ resource "aws_eks_node_group" "this" {
     min_size     = 1
   }
 
-  subnet_ids      = module.vpc.private_subnet_ids
+
+  subnet_ids      = var.node_subnet_ids
   disk_size       = 20
   instance_types  = ["t3.medium"]
-  node_group_name = "my-node-group"
+  node_group_name = "${var.cluster_name}-NodeGroup"
 
   depends_on = [
+    aws_eks_cluster.this,
     aws_iam_role_policy_attachment.worker_node_policy,
     aws_iam_role_policy_attachment.cni_policy,
-    aws_iam_role_policy_attachment.ecr_policy,
-    aws_nat_gateway.this
+    aws_iam_role_policy_attachment.ecr_policy
   ]
 
 }

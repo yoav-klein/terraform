@@ -141,6 +141,7 @@ resource "aws_subnet" "private_subnets" {
     vpc_id = aws_vpc.this.id
     availability_zone = var.private_subnets[count.index].az
     cidr_block = var.private_subnets[count.index].cidr
+    
     tags = merge({
         Name = "${var.name}-prvt-subnet-${count.index}"
     }, var.private_subnet_tags)

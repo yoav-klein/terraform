@@ -33,8 +33,45 @@ module "eks" {
     source = "../../../modules/eks"
 
     cluster_name = "simple"
-    node_count = 1
+    node_count = 2
     cluster_subnet_ids = module.vpc.private_subnets[*].id
     node_subnet_ids = module.vpc.private_subnets[*].id
 
 }
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_eks_access_entry" "admin" {
+  cluster_name      = module.eks.cluster.name
+  principal_arn     = data.aws_caller_identity.current.arn
+  type              = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "admin" {
+  cluster_name  = module.eks.cluster.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = data.aws_caller_identity.current.arn
+
+  access_scope {
+    type       = "cluster"
+  }
+}
+
+
+resource "aws_eks_access_entry" "root" {
+  cluster_name      = module.eks.cluster.name
+  principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+  type              = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "root" {
+  cluster_name  = module.eks.cluster.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+
+
+  access_scope {
+    type       = "cluster"
+  }
+}
+
