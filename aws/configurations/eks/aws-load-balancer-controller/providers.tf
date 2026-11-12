@@ -16,7 +16,9 @@ terraform {
   }
 }
 
-provider "aws" {}
+provider "aws" {
+    region = "us-east-1"
+}
 
 provider "kubectl" {
   load_config_file       = false
@@ -34,14 +36,14 @@ provider "helm" {
 }
 
 data "aws_eks_cluster" "this" {
-  name = aws_eks_cluster.this.name
+  name = module.eks.cluster.name
 
-  depends_on = [aws_eks_cluster.this]
+  depends_on = [module.eks.cluster]
 }
 
 data "aws_eks_cluster_auth" "this" {
-  name = aws_eks_cluster.this.name
+  name = module.eks.cluster.name
 
-  depends_on = [aws_eks_cluster.this]
+  depends_on = [module.eks.cluster]
 }
 

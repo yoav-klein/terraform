@@ -40,6 +40,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: numbers
+  namespace: example-ns
   labels:
     app: numbers
 spec:
@@ -65,6 +66,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: numbers
+  namespace: example-ns
 spec:
   type: NodePort
   selector:

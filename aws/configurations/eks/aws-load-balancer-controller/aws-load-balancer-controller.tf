@@ -20,18 +20,18 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.this.arn]
+      identifiers = [module.eks.openid_connect_provider.arn]
     }
 
     condition {
       test     = "StringEquals"
-      variable = "${replace(aws_iam_openid_connect_provider.this.url, "https://", "")}:sub"
+      variable = "${replace(module.eks.openid_connect_provider.url, "https://", "")}:sub"
       values   = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
     }
 
     condition {
       test     = "StringEquals"
-      variable = "${replace(aws_iam_openid_connect_provider.this.url, "https://", "")}:aud"
+      variable = "${replace(module.eks.openid_connect_provider.url, "https://", "")}:aud"
       values   = ["sts.amazonaws.com"]
     }
   }
@@ -62,8 +62,14 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_role_pol
 ###############################
 
 
-data "kubectl_file_documents" "ingress_class" {
-  content = file("manifests/ingclass.yaml")
+#data "kubectl_file_documents" "ingress_class" {
+#  content = file("manifests/ingclass.yaml")
+#}
+
+resource "time_sleep" "wait_for_access_policy" {
+    create_duration = "20s"
+
+    depends_on = [aws_eks_access_policy_association.admin]
 }
 
 
@@ -81,10 +87,12 @@ metadata:
   namespace: kube-system
 YAML
 
-  depends_on = [aws_eks_cluster.this, aws_iam_role.aws_load_balancer_controller]
+  depends_on = [ time_sleep.wait_for_access_policy ]
 }
 
 resource "helm_release" "aws_load_balancer_controller" {
+  depends_on = [ time_sleep.wait_for_access_policy ]
+
   name  = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
   chart = "aws-load-balancer-controller"
@@ -96,7 +104,7 @@ resource "helm_release" "aws_load_balancer_controller" {
     },
     {
         name = "clusterName"
-        value = aws_eks_cluster.this.name
+        value = module.eks.cluster.name
     },
     {
         name = "serviceAccount.create"
@@ -105,6 +113,10 @@ resource "helm_release" "aws_load_balancer_controller" {
     {
         name = "serviceAccount.name"
         value = "aws-load-balancer-controller" 
+    },
+    {
+        name = "logLevel"
+        value = "debug"
     }
   ]
 }
