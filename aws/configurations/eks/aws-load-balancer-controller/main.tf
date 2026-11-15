@@ -54,6 +54,7 @@ resource "aws_eks_access_entry" "root" {
 }
 
 resource "aws_eks_access_policy_association" "root" {
+  depends_on = [aws_eks_access_entry.root]
   cluster_name  = module.eks.cluster.name
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
