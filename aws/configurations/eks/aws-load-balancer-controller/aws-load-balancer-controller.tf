@@ -62,10 +62,6 @@ resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_role_pol
 ###############################
 
 
-#data "kubectl_file_documents" "ingress_class" {
-#  content = file("manifests/ingclass.yaml")
-#}
-
 resource "time_sleep" "wait_for_access_policy" {
     create_duration = "20s"
 
@@ -90,8 +86,51 @@ YAML
   depends_on = [ time_sleep.wait_for_access_policy ]
 }
 
+############
+# Gateway CRDs must be installed BEFORE the ALB controller in order for the Gateway controller to be enabled
+############
+
+data "http" "gateway_crds" {
+    url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.0/standard-install.yaml"
+}
+
+data "kubectl_file_documents" "gateway_crds" {
+    content = data.http.gateway_crds.response_body
+}
+
+resource "kubectl_manifest" "gateway_crds" {
+    for_each = data.kubectl_file_documents.gateway_crds.manifests
+
+    yaml_body = each.value
+    server_side_apply = true
+    
+    depends_on = [ time_sleep.wait_for_access_policy ]
+}
+
+data "http" "gateway_crds_aws_load_balancer_controller" {
+    url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/refs/heads/main/config/crd/gateway/gateway-crds.yaml"
+}
+
+data "kubectl_file_documents" "gateway_crds_aws_load_balancer_controller" {
+    content = data.http.gateway_crds_aws_load_balancer_controller.response_body
+}
+
+resource "kubectl_manifest" "gateway_crds_aws_load_balancer_controller" {
+    for_each = data.kubectl_file_documents.gateway_crds_aws_load_balancer_controller.manifests
+
+    yaml_body = each.value
+    server_side_apply = true
+  
+    depends_on = [ time_sleep.wait_for_access_policy ]
+}
+
+
+############
+# The AWS Load Balancer Contoller
+############
+
 resource "helm_release" "aws_load_balancer_controller" {
-  depends_on = [ time_sleep.wait_for_access_policy ]
+  depends_on = [ time_sleep.wait_for_access_policy, kubectl_manifest.gateway_crds , kubectl_manifest.gateway_crds_aws_load_balancer_controller ]
 
   name  = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
